@@ -90,7 +90,7 @@ const Scalar WHITE = Scalar(255,255,255);
 }
 
 -(UIImage *)findPuzzle:(UIImage *)image {
-    
+    UIImage *resImage;
     cv::Mat cvImage, cvImageCopy;
     UIImageToMat(image, cvImage);
     cvImage.copyTo(cvImageCopy);
@@ -106,7 +106,7 @@ const Scalar WHITE = Scalar(255,255,255);
     adaptiveThreshold(gray, thresh, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 135, 15);
     thresh.copyTo(threshCopy);
     
-//    UIImage *resImage = MatToUIImage(threshCopy);
+//    resImage = MatToUIImage(threshCopy);
     
     // find all contours
     vector<vector<Point2i> > contours0;
@@ -135,13 +135,15 @@ const Scalar WHITE = Scalar(255,255,255);
 
     cout << "maxi: " << endl << maxi << endl;
 
-//    drawContours(cvImageCopy, contours, maxi, BLUE, 4, 8);
-//    
+    drawContours(cvImageCopy, contours, maxi, BLUE, 4, 8);
+
 //    for (int i = 0; i < contours[maxi].size(); i++) {
 //        cout << contours[maxi][i] << endl;
 //        circle(cvImageCopy, contours[maxi][i], 15, BLUE, 2, 8, 0);
 //    }
     
+//    resImage = MatToUIImage(cvImageCopy);
+
     // find warp function
     vector<Point2f> corner;
     corner.push_back(contours[maxi][0]); // bottom right
@@ -166,14 +168,13 @@ const Scalar WHITE = Scalar(255,255,255);
     cv::Size size(w, h);
     warpPerspective(cvImage, cvImageCopy, M, size);
     
-    //拉普拉斯锐化
-    float kernel_data[10] = {-1, -1, -1, -1, 8, -1, -1, -1, -1};
-    Mat kernel(3, 3, CV_32F, kernel_data);
-    cout << kernel << endl;
-    filter2D(cvImageCopy, cvImageCopy, cvImageCopy.depth(), kernel);
+//    //拉普拉斯锐化
+//    float kernel_data[10] = {-1, -1, -1, -1, 8, -1, -1, -1, -1};
+//    Mat kernel(3, 3, CV_32F, kernel_data);
+//    cout << kernel << endl;
+//    filter2D(cvImageCopy, cvImageCopy, cvImageCopy.depth(), kernel);
     
     Mat warp_thresh;
-    UIImage *resImage;
     
     cout << "size:" << endl;
     cout << w << " " << h << endl;
@@ -181,20 +182,20 @@ const Scalar WHITE = Scalar(255,255,255);
     cout << "matrix size:" << endl;
     cout << cvImageCopy.rows << " " << cvImageCopy.cols << endl;
     
-    int rowstep = cvImageCopy.rows / 9;
-    int colstep = cvImageCopy.cols / 9;
-    for (int i = 0; i < 9; i += 1) {
-        for (int j = 0; j < 9; j += 1) {
-            Mat grid = cvImageCopy.rowRange(max(0, (int)(i * rowstep * 0.99)), min((int)((i + 1) * rowstep * 1.01), cvImageCopy.rows)).colRange(max(0, (int)(j * colstep * 0.99)), min((int)((j + 1) * colstep * 1.01), cvImageCopy.cols));
-            cout << i << " " << j << endl;
-            resImage = MatToUIImage([self findGrid:&grid]);
-            [self saveLocal:resImage mode:@"origin" row:i col:j];
-            resImage = MatToUIImage([self findGridGray:&grid]);
-            [self saveLocal:resImage mode:@"gray" row:i col:j];
-            resImage = MatToUIImage([self findGridEdge:&grid]);
-            [self saveLocal:resImage mode:@"edge" row:i col:j];
-        }
-    }
+//    int rowstep = cvImageCopy.rows / 9;
+//    int colstep = cvImageCopy.cols / 9;
+//    for (int i = 0; i < 9; i += 1) {
+//        for (int j = 0; j < 9; j += 1) {
+//            Mat grid = cvImageCopy.rowRange(max(0, (int)(i * rowstep * 0.99)), min((int)((i + 1) * rowstep * 1.01), cvImageCopy.rows)).colRange(max(0, (int)(j * colstep * 0.99)), min((int)((j + 1) * colstep * 1.01), cvImageCopy.cols));
+//            cout << i << " " << j << endl;
+//            resImage = MatToUIImage([self findGrid:&grid]);
+//            [self saveLocal:resImage mode:@"origin" row:i col:j];
+//            resImage = MatToUIImage([self findGridGray:&grid]);
+//            [self saveLocal:resImage mode:@"gray" row:i col:j];
+//            resImage = MatToUIImage([self findGridEdge:&grid]);
+//            [self saveLocal:resImage mode:@"edge" row:i col:j];
+//        }
+//    }
     
     resImage = MatToUIImage(cvImageCopy);
 

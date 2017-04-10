@@ -1,48 +1,55 @@
-# 16423 Final Project Proposal 
+# 16423 Final Project Checkpoint 
+Team Member: Hanyu Yang (hanyuy), Xi Sun (xis)
 
 ### Title
-cvSudoku
+cvSudoku ([YouTube Playlist](https://www.youtube.com/playlist?list=PL6UuR-LmCZb6zDEEhoDGfS-63D7cWFCzI))
 
 ### Summary
-In this project we are developing an iOS application that allows users to solve printed Sudoku. The application automatically generates the solution or prints “Invalid Board” after the device camera captures the board. Once the user clicks on one of the blank spaces, a list of valid digit options pops up for the user to enter, either through voice input or by clicking on the options. The entered digit appears on the screen as augmented reality. Once the board is filled, the application gives feedback on correctness based on the solution generated. 
 
-This project involves computer vision techniques such as Hough transform for detecting the frame, and digit recognition. 
+In this project we are developing an iOS application that allows users to interact with a printed Sudoku on their iOS devices. This project involves computer vision and machine learning techniques such as edge detection, contour finding, warp transform, digit recognition and deep learning.
 
-### Background
-To detect the frame and project numbers, we will need feature point detectors, descriptor generators, as well as homography and camera extrinsic matrices computation.
+### Task completed
 
-* We would use SIFT, FAST or BRIEF to detect feature points and generate descriptors. 
-* To speed up matrix computation, we would use the Armadillo Library. 
-* LK algorithm or Correlation filters would be applied to keep track of the movement of the Sudoku board in real-time.
-* Learning algorithms and MNIST dataset might be applied for handwritten digits recognition.
-* Algorithm to solve Sudoku puzzles.
+* Sudoku puzzle board (hanyuy)
+	
+	On top of the photo taking project in previous assignment, I develop employ OpenCV libraries to detect all edges in the photo, find the largest contour, which is the sudoku puzzle.
 
-### Challenges
-In this project, the following problems need to be solved:
+* Warp Transform and digit grid extraction (hanyuy)
+	
+	After finding the largest contour, we can train the warp transform parameters based on the corners of the contour, and then apply the transform to the whole sudoku board to display on full screen. Then averagely divide into 9 * 9 grids.
 
-* Detect Sudoku grids and digits. Since we need to recognize both printed and handwriting version of digits, it takes time.
-* Solve the Sudoku for correctness checking. It should have open-source algorithms for our reference.
-* Real-time tracking of the Sudoku board. Not easy to do it efficiently.
-* Touch selection and voice input. Since camera takes up the screen, touch and voice interactions seem more user-friendly.
-* AR display of the digits. If we have time, we will explore to use AR techniques in the project.
+* Digit recognition (xis) 
 
-### Goals & Deliverables
-Our basic goal is to develop an iOS App that can recognize an unsolved Sudoku and let you complete it with touch select grid and voice input interaction. If it goes really well and we get ahead of schedule, we will consider to add AR techniques on digit options display.
+	Able to train and classify pictures of hand-written or printed numbers. Trains the parameters using the K-Nearest Neighbors in OpenCV. The testing data is read in from images including a single number, either handwritten or printed. The inputs are stored as 28x28 images, and the labels are simply a number between 0 and 9.
+	
+* Preprocessing the input images
+	
+	The input images are preprocessed so that the number (main content) in the image is centered and thresholded, and is of the same format as the training images. 
 
-Finally we will deliver our achievements through a YouTube video and show how to run it on in-class presentation if possible. I believe we could finish at least the basic goal of our project.
+### Task to do
 
-### Schedule
-We have approximately 4 weeks to complete the project, with a checkpoint due in 2 weeks. So we schedule the development process roughly as follow:
+* Sudoku Solver (hanyuy)
 
-* Week 1: Build an iOS app to detect grids and digits of a Sudoku (static).
-* Week 2: Complete Sudoku algorithm and implement correctness checking. (Check Point)
-* Week 3: Real-time tracking, grid select by screen touch and Voice input. 
-* Week 4: Improve performance and explore AR techniques (optional).
+	For the first week, we will combine our functions together and try to construct a sudoku matrix and solve it.
+
+* Digits distinguish (xis)
+
+	For the second week, we will try to distinguish the printed digit (puzzle) from handwritten ones (half completed one).
+	
+* Screen Interaction (together)
+
+	For the third week, we will detect screen touch operation on grids and display possible digit options for users.
+
+* Improve performance and exploration (together)
+
+	Finally, we will find out the bottleneck of the App and try to substitute with better solution and explore advanced features.
+
+### Questions
+
+* What is the best way to commit for an xcode project? Are we supposed to upload configuration files, frameworks and libraries to Github or just source code? 
+
+* What is the most efficient way to extract contents from camera frames and provide feedback to users based on interaction?
 
 ### Reference:
-* [IPHONE SUDOKU GRAB](http://sudokugrab.blogspot.com/2009/07/how-does-it-all-work.html)
-* [SuDoKu Grabber in OpenCV](http://aishack.in/tutorials/sudoku-grabber-opencv-plot/)
-* [Vuforia Developer Portal](https://developer.vuforia.com/)
-
-
+* [Sudoku recognizer](http://www.shogun-toolbox.org/static/notebook/current/Sudoku_recognizer.html#Sudoku-recognizer)
 
