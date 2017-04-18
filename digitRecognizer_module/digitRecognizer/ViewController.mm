@@ -37,6 +37,23 @@
     //UIImage *image = [UIImage imageNamed:@"digit_4.jpg"];
     NSString *imageDirectory = @"digit_4.jpg";
     std::string imageDir = std::string([imageDirectory UTF8String]);
+    //NSString *imagePath = @"train-images.idx3-ubyte";
+    //std::string imgPath = std::string([imagePath UTF8String]);
+    //NSString *labelPath = @"train-labels.idx1-ubyte";
+    //std::string lbPath = std::string([labelPath UTF8String]);
+
+    
+    NSString *testPath = [[NSBundle mainBundle] pathForResource:@"digit_4" ofType:@"jpg"];
+    std::string digitPath = std::string([testPath UTF8String]);
+    cout << digitPath << endl;
+    
+    NSString *imgPath = [[NSBundle mainBundle] pathForResource:@"train-images.idx3-ubyte" ofType:@""];
+    std::string trainImgPath = std::string([imgPath UTF8String]);
+    cout << trainImgPath << endl;
+    
+    NSString *labelPath = [[NSBundle mainBundle] pathForResource:@"train-labels.idx1-ubyte" ofType:@""];
+    std::string trainLabelPath = std::string([labelPath UTF8String]);
+    cout << trainLabelPath << endl;
     
     //imageView_ = [[UIImageView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width, self.view.frame.size.height)];
     
@@ -78,8 +95,8 @@
     int number = dr->classify(cell);
     std::cout << number << std::endl;
      */
-    cv::Mat input = cv::imread("/Users/xis/Desktop/digit_4.jpg", CV_8UC1);
-    int number = recognize(input);
+    cv::Mat input = cv::imread(digitPath, CV_8UC1);
+    int number = recognize(input, trainImgPath, trainLabelPath);
     std::cout << number << std::endl;
 }
 

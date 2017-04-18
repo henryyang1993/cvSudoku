@@ -16,7 +16,8 @@
 #include <stdlib.h> // Include the standard library
 
 using namespace cv;
+using namespace std;
 
-int recognize(Mat input);
+int recognize(Mat input, string imgPath, string lbPath);
 
 #endif /* outputNumber_hpp */

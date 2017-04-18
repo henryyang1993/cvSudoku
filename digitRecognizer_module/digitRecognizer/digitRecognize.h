@@ -28,7 +28,7 @@ public:
     
     ~DigitRecognizer();
     
-    bool train(char* trainPath, char* labelsPath);
+    bool train(const char* trainPath, const char* labelsPath);
     
     int classify(Mat img);
     

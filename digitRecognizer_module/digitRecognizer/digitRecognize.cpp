@@ -32,7 +32,7 @@ int DigitRecognizer::readFlippedInteger(FILE *fp) {
     
 }
 
-bool DigitRecognizer::train(char *trainPath, char *labelsPath) {
+bool DigitRecognizer::train(const char *trainPath, const char *labelsPath) {
     FILE *fp = fopen(trainPath, "rb");
     FILE *fp2 = fopen(labelsPath, "rb");
     

@@ -14,8 +14,9 @@
 
 
 using namespace cv;
+using namespace std;
 
-int recognize(Mat input) {
+int recognize(Mat input, string imgPath, string lbPath) {
     
     //std::cout << "path to image: " << imgPath << std::endl;
     Mat cvOld = Mat(cv::Size(28, 28), CV_8UC1);
@@ -24,13 +25,13 @@ int recognize(Mat input) {
     adaptiveThreshold(cvOld, cvThreshold, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY_INV, 101, 1.0);
     
     
-    
-    
     DigitRecognizer *dr = new DigitRecognizer();
     
+    const char *trainImgPath = imgPath.c_str();
+    const char *trainLbPath = lbPath.c_str();
+
     
-    
-    bool b = dr->train((char*)"train-images.idx3-ubyte", (char*)"train-labels.idx1-ubyte"); //change directory
+    bool b = dr->train(trainImgPath, trainLbPath); //change directory
     std::cout << b << std::endl;
     
     int dist = cvThreshold.rows;
