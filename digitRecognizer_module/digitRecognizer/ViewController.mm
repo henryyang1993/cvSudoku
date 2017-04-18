@@ -78,7 +78,8 @@
     int number = dr->classify(cell);
     std::cout << number << std::endl;
      */
-    int number = recognize("/Users/xis/Desktop/digit_4.jpg");
+    cv::Mat input = cv::imread("/Users/xis/Desktop/digit_4.jpg", CV_8UC1);
+    int number = recognize(input);
     std::cout << number << std::endl;
 }
 

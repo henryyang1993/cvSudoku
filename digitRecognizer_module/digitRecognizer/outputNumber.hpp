@@ -17,6 +17,6 @@
 
 using namespace cv;
 
-int recognize(std::string imgDir);
+int recognize(Mat input);
 
 #endif /* outputNumber_hpp */
