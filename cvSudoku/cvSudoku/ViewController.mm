@@ -16,6 +16,10 @@
 
 // Simple OpenCV Example......
 #include <stdlib.h>
+
+#include "digitRecognize.h"
+#include "outputNumber.hpp"
+
 using namespace std;
 using namespace cv;
 
@@ -48,6 +52,23 @@ const Scalar WHITE = Scalar(255,255,255);
     // 1. Setup the your OpenCV view, so it takes up the entire App screen......
     int view_width = self.view.frame.size.width;
     int view_height = (640*view_width)/480; // Work out the viw-height assuming 640x480 input
+    
+    
+    NSString *testPath = [[NSBundle mainBundle] pathForResource:@"digit_4" ofType:@"jpg"];
+    std::string digitPath = std::string([testPath UTF8String]);
+    cout << digitPath << endl;
+    
+    NSString *imgPath = [[NSBundle mainBundle] pathForResource:@"train-images.idx3-ubyte" ofType:@""];
+    std::string trainImgPath = std::string([imgPath UTF8String]);
+    cout << trainImgPath << endl;
+    
+    NSString *labelPath = [[NSBundle mainBundle] pathForResource:@"train-labels.idx1-ubyte" ofType:@""];
+    std::string trainLabelPath = std::string([labelPath UTF8String]);
+    cout << trainLabelPath << endl;
+    
+    cv::Mat input = cv::imread(digitPath, CV_8UC1);
+    int number = recognize(input, trainImgPath, trainLabelPath);
+    std::cout << number << std::endl;
     
     liveView_ = [[UIImageView alloc] initWithFrame:CGRectMake(0.0, 0.0, view_width, view_height)];
     [self.view addSubview:liveView_]; // Important: add liveView_ as a subview
