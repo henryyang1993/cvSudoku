@@ -9,7 +9,7 @@
 #import "ViewController.h"
 
 // Include sudoku solver program
-//#include "solver.h"
+#import "solver.hpp"
 
 // Include iostream and std namespace so we can mix C++ code in here
 #include <iostream>
@@ -38,6 +38,10 @@ const Scalar WHITE = Scalar(255,255,255);
     UIImageView *resultView_; // Preview view of everything...
     UIButton *takephotoButton_, *goliveButton_; // Button to initiate OpenCV processing of image
     CvPhotoCamera *photoCamera_; // OpenCV wrapper class to simplfy camera access through AVFoundation
+    string trainImgPath;
+    string trainLabelPath;
+    Mat ggrid;
+    int digit;
 }
 @end
 
@@ -61,16 +65,16 @@ const Scalar WHITE = Scalar(255,255,255);
     cout << digitPath << endl;
     
     NSString *imgPath = [[NSBundle mainBundle] pathForResource:@"train-images.idx3-ubyte" ofType:@""];
-    std::string trainImgPath = std::string([imgPath UTF8String]);
+    trainImgPath = std::string([imgPath UTF8String]);
     cout << trainImgPath << endl;
     
     NSString *labelPath = [[NSBundle mainBundle] pathForResource:@"train-labels.idx1-ubyte" ofType:@""];
-    std::string trainLabelPath = std::string([labelPath UTF8String]);
+    trainLabelPath = std::string([labelPath UTF8String]);
     cout << trainLabelPath << endl;
     
     cv::Mat input = cv::imread(digitPath, CV_8UC1);
-    int number = recognize(input, trainImgPath, trainLabelPath);
-    std::cout << number << std::endl;
+    digit = recognize(input, trainImgPath, trainLabelPath);
+    std::cout << "number: " << digit << std::endl;
     
     
     //-------------------------------------------------------------------------------------------------------------------------
@@ -108,11 +112,11 @@ const Scalar WHITE = Scalar(255,255,255);
     photoCamera_.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait;
     
     // This starts the camera capture
-    [photoCamera_ start];
+//    [photoCamera_ start];
 
-//    UIImage *image = [UIImage imageNamed:@"sudoku.JPG"];
-//    if(image != nil) liveView_.image = [self findPuzzle:image];
-//    else cout << "Cannot read in the file" << endl;
+    UIImage *image = [UIImage imageNamed:@"sudoku.JPG"];
+    if(image != nil) liveView_.image = [self findPuzzle:image];
+    else cout << "Cannot read in the file" << endl;
     
 }
 
@@ -209,27 +213,46 @@ const Scalar WHITE = Scalar(255,255,255);
     cout << "matrix size:" << endl;
     cout << cvImageCopy.rows << " " << cvImageCopy.cols << endl;
     
-//    int rowstep = cvImageCopy.rows / 9;
-//    int colstep = cvImageCopy.cols / 9;
-//    for (int i = 0; i < 9; i += 1) {
-//        for (int j = 0; j < 9; j += 1) {
+    int rowstep = cvImageCopy.rows / 9;
+    int colstep = cvImageCopy.cols / 9;
+    for (int i = 0; i < 3; i += 1) {
+        for (int j = 0; j < 3; j += 1) {
 //            Mat grid = cvImageCopy.rowRange(max(0, (int)(i * rowstep * 0.99)), min((int)((i + 1) * rowstep * 1.01), cvImageCopy.rows)).colRange(max(0, (int)(j * colstep * 0.99)), min((int)((j + 1) * colstep * 1.01), cvImageCopy.cols));
-//            cout << i << " " << j << endl;
-//            resImage = MatToUIImage([self findGrid:&grid]);
-//            [self saveLocal:resImage mode:@"origin" row:i col:j];
+            int rrange = (int)rowstep * 0.2;
+            int crange = (int)colstep * 0.1;
+            Mat grid = cvImageCopy.rowRange(i * rowstep + rrange, (i + 1) * rowstep - rrange).colRange(j * colstep + crange, (j + 1) * colstep - crange);
+            cout << "loop: " << i << " " << j << endl;
+//            ggrid = [self findGridGray:&grid];
+//            Mat input = [self rectify:&ggrid];
+//            resImage = MatToUIImage(input);
+            
+            NSString *filename = [NSString stringWithFormat:@"gray%d%d", i, j];
+            NSString *testPath = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
+            std::string digitPath = std::string([testPath UTF8String]);
+//            cout << digitPath << endl;
+            cv::Mat input = cv::imread(digitPath, CV_8UC1);
+            digit = recognize(input, trainImgPath, trainLabelPath);
+            std::cout << "digit: " << digit << std::endl;
+
 //            resImage = MatToUIImage([self findGridGray:&grid]);
 //            [self saveLocal:resImage mode:@"gray" row:i col:j];
-//            resImage = MatToUIImage([self findGridEdge:&grid]);
-//            [self saveLocal:resImage mode:@"edge" row:i col:j];
-//        }
-//    }
+        }
+    }
     
-    resImage = MatToUIImage(cvImageCopy);
+//    resImage = MatToUIImage(cvImageCopy);
 
     // Special part to ensure the image is rotated properly when the image is converted back
     UIImage *retImage = [UIImage imageWithCGImage:[resImage CGImage] scale:1.0 orientation:UIImageOrientationRight];
     
+//    return resImage;
     return retImage;
+}
+
+-(Mat)rectify:(Mat *)grid {
+    Mat res;
+//    flip(*grid, res, -1);
+    res = *grid;
+    return res;
 }
 
 -(Mat)findGrid:(Mat *)grid {
@@ -257,7 +280,7 @@ const Scalar WHITE = Scalar(255,255,255);
     Mat warp_gray;
     cv::cvtColor(gridCopy, warp_gray, CV_RGBA2GRAY); // Convert to grayscale
     
-//    GaussianBlur(warp_gray, warp_gray, cv::Size(15, 15), 1.5, 1.5);
+    //    GaussianBlur(warp_gray, warp_gray, cv::Size(15, 15), 1.5, 1.5);
     
     Mat thresh, threshCopy;
     
@@ -275,7 +298,7 @@ const Scalar WHITE = Scalar(255,255,255);
     // Create paths to output images
     NSString *filename = [NSString stringWithFormat:@"Documents/%@%d%d.jpg", m, i, j];
     NSString *jpgPath = [NSHomeDirectory() stringByAppendingPathComponent:filename];
-//    NSString  *pngPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/Test.png"];
+    //    NSString  *pngPath = [NSHomeDirectory() stringByAppendingPathComponent:@"Documents/Test.png"];
     
     // Write a UIImage to JPEG with minimum compression (best quality)
     // The value 'image' must be a UIImage object
@@ -284,7 +307,7 @@ const Scalar WHITE = Scalar(255,255,255);
     NSLog(@"%@", jpgPath);
     
     // Write image to PNG
-//    [UIImagePNGRepresentation(image) writeToFile:pngPath atomically:YES];
+    //    [UIImagePNGRepresentation(image) writeToFile:pngPath atomically:YES];
     
     // Let's check to see if files were successfully written...
     
@@ -298,7 +321,6 @@ const Scalar WHITE = Scalar(255,255,255);
     // Write out the contents of home directory to console
     NSLog(@"Documents directory: %@", [fileMgr contentsOfDirectoryAtPath:documentsDirectory error:&error]);
 }
-
 
 //===============================================================================================
 // This member function is executed when the button is pressed
