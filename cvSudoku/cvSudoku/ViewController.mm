@@ -60,7 +60,7 @@ const Scalar WHITE = Scalar(255,255,255);
     //---------------------------testing digit recognition from input image files---------------------------------------------
     
     // Recognizing image of hand-written digit 4 in the Resource folder
-    NSString *testPath = [[NSBundle mainBundle] pathForResource:@"gray01" ofType:@"jpg"];
+    NSString *testPath = [[NSBundle mainBundle] pathForResource:@"gray06" ofType:@"jpg"];
     std::string digitPath = std::string([testPath UTF8String]);
     cout << digitPath << endl;
     
@@ -73,7 +73,16 @@ const Scalar WHITE = Scalar(255,255,255);
     cout << trainLabelPath << endl;
     
     cv::Mat input = cv::imread(digitPath, CV_8UC1);
-    digit = recognize(input, trainImgPath, trainLabelPath);
+    
+    DigitRecognizer *dr = new DigitRecognizer();
+    
+    const char *trainPath1 = trainImgPath.c_str();
+    const char *trainPath2 = trainLabelPath.c_str();
+    
+    
+    bool b = dr->train(trainPath1, trainPath2);
+    
+    digit = recognize(input, dr);
     std::cout << "number: " << digit << std::endl;
     
     
@@ -215,6 +224,15 @@ const Scalar WHITE = Scalar(255,255,255);
     
     int rowstep = cvImageCopy.rows / 9;
     int colstep = cvImageCopy.cols / 9;
+    
+    
+    DigitRecognizer *dr = new DigitRecognizer();
+    
+    const char *trainPath1 = trainImgPath.c_str();
+    const char *trainPath2 = trainLabelPath.c_str();
+    
+    bool b = dr->train(trainPath1, trainPath2);
+    
     for (int i = 0; i < 3; i += 1) {
         for (int j = 0; j < 3; j += 1) {
 //            Mat grid = cvImageCopy.rowRange(max(0, (int)(i * rowstep * 0.99)), min((int)((i + 1) * rowstep * 1.01), cvImageCopy.rows)).colRange(max(0, (int)(j * colstep * 0.99)), min((int)((j + 1) * colstep * 1.01), cvImageCopy.cols));
@@ -231,7 +249,9 @@ const Scalar WHITE = Scalar(255,255,255);
             std::string digitPath = std::string([testPath UTF8String]);
 //            cout << digitPath << endl;
             cv::Mat input = cv::imread(digitPath, CV_8UC1);
-            digit = recognize(input, trainImgPath, trainLabelPath);
+            
+
+            digit = recognize(input, dr);
             std::cout << "digit: " << digit << std::endl;
 
 //            resImage = MatToUIImage([self findGridGray:&grid]);

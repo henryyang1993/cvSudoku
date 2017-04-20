@@ -18,6 +18,6 @@
 using namespace cv;
 using namespace std;
 
-int recognize(Mat input, string imgPath, string lbPath);
+int recognize(Mat input, DigitRecognizer *dr); //string imgPath, string lbPath
 
 #endif /* outputNumber_hpp */
