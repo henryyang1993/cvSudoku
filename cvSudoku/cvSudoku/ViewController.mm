@@ -60,7 +60,7 @@ const Scalar WHITE = Scalar(255,255,255);
     //---------------------------testing digit recognition from input image files---------------------------------------------
     
     // Recognizing image of hand-written digit 4 in the Resource folder
-    NSString *testPath = [[NSBundle mainBundle] pathForResource:@"gray06" ofType:@"jpg"];
+    NSString *testPath = [[NSBundle mainBundle] pathForResource:@"digit_4" ofType:@"jpg"];
     std::string digitPath = std::string([testPath UTF8String]);
     cout << digitPath << endl;
     
@@ -233,24 +233,23 @@ const Scalar WHITE = Scalar(255,255,255);
     
     bool b = dr->train(trainPath1, trainPath2);
     
-    for (int i = 0; i < 3; i += 1) {
-        for (int j = 0; j < 3; j += 1) {
+    for (int i = 0; i < 9; i += 1) {
+        for (int j = 0; j < 9; j += 1) {
 //            Mat grid = cvImageCopy.rowRange(max(0, (int)(i * rowstep * 0.99)), min((int)((i + 1) * rowstep * 1.01), cvImageCopy.rows)).colRange(max(0, (int)(j * colstep * 0.99)), min((int)((j + 1) * colstep * 1.01), cvImageCopy.cols));
-            int rrange = (int)rowstep * 0.2;
+            int rrange = (int)rowstep * 0.1;
             int crange = (int)colstep * 0.1;
             Mat grid = cvImageCopy.rowRange(i * rowstep + rrange, (i + 1) * rowstep - rrange).colRange(j * colstep + crange, (j + 1) * colstep - crange);
             cout << "loop: " << i << " " << j << endl;
-//            ggrid = [self findGridGray:&grid];
-//            Mat input = [self rectify:&ggrid];
+            ggrid = [self findGridGray:&grid];
+            Mat input = [self rectify:&ggrid];
 //            resImage = MatToUIImage(input);
             
-            NSString *filename = [NSString stringWithFormat:@"gray%d%d", i, j];
-            NSString *testPath = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
-            std::string digitPath = std::string([testPath UTF8String]);
+//            NSString *filename = [NSString stringWithFormat:@"gray%d%d", i, j];
+//            NSString *testPath = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
+//            std::string digitPath = std::string([testPath UTF8String]);
 //            cout << digitPath << endl;
-            cv::Mat input = cv::imread(digitPath, CV_8UC1);
+//            cv::Mat input = cv::imread(digitPath, CV_8UC1);
             
-
             digit = recognize(input, dr);
             std::cout << "digit: " << digit << std::endl;
 
