@@ -63,7 +63,7 @@ const Scalar WHITE = Scalar(255,255,255);
     //---------------------------testing digit recognition from input image files---------------------------------------------
     
     // Recognizing image of hand-written digit 4 in the Resource folder
-    NSString *testPath = [[NSBundle mainBundle] pathForResource:@"gray42" ofType:@"jpg"];
+    NSString *testPath = [[NSBundle mainBundle] pathForResource:@"gray02" ofType:@"jpg"];
     std::string digitPath = std::string([testPath UTF8String]);
     cout << digitPath << endl;
     

@@ -23,7 +23,7 @@ Mat crop_image (Mat input) {
     int crop_w;
     int crop_h;
     if (input.rows > 120 && input.cols > 125) {
-        crop_w = input.rows-80;
+        crop_w = input.rows-100;
         crop_h = input.cols-10;
         int x = input.cols/2 - crop_h/2;
         int y = input.rows/2 - crop_w/2;
