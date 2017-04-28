@@ -42,23 +42,36 @@ int recognize(Mat input, DigitRecognizer *dr) { //string imgPath, string lbPath
     
 
     Mat cropped;
-    cropped = crop_image(input);
-
+//    cropped = crop_image(input);
+    cropped = input;
     
     //std::cout << "path to image: " << imgPath << std::endl;
-    Mat cvOld = Mat(cv::Size(28, 28), CV_8UC1);
-    cvOld = cropped; //imread(imgPath, CV_8UC1); //change the directory
-    Mat cvThreshold = cvOld.clone();
-    adaptiveThreshold(cvOld, cvThreshold, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY_INV, 101, 1.0);
+    Mat cvOld;
+    resize(cropped, cvOld, Size(28, 28));
     
+//    cvOld = cropped; //imread(imgPath, CV_8UC1); //change the directory
+    Mat cvaThreshold = cvOld.clone();
+    Mat cvThreshold = cvOld.clone();
+    adaptiveThreshold(cvOld, cvaThreshold, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY_INV, 101, 1.0);
+    threshold(cvOld, cvThreshold, 150, 255, THRESH_BINARY_INV);
     
     int count = 0;
     for (int i = 0; i < cvThreshold.rows; i++) {
         for (int j = 0; j < cvThreshold.cols; j++) {
+            if (i < 2 || j < 2 || i >= cvThreshold.rows - 2 || j >= cvThreshold.cols - 2) {
+                cvThreshold.at<uchar>(i, j) = 0;
+            }
             if (cvThreshold.at<uchar>(i, j) == 0)
                 count++;
         }
     }
+    
+    cout << "cvaThreshold" << endl;
+    cout << cvaThreshold << endl;
+    
+    cout << "cvThreshold" << endl;
+    cout << cvThreshold << endl;
+    
     double black_pixels = 1 - count/(double)(cvThreshold.rows*cvThreshold.cols);
     cout << "black percentage: " << black_pixels << endl;
     //DigitRecognizer *dr = new DigitRecognizer();
@@ -69,20 +82,20 @@ int recognize(Mat input, DigitRecognizer *dr) { //string imgPath, string lbPath
     
     //bool b = dr->train(trainImgPath, trainLbPath);
     
-    if (black_pixels < 0.05) {
+    if (black_pixels < 0.005) {
         return 0;
     } else {
-        int dist = cvThreshold.rows;
+        int dist = cvaThreshold.rows;
         cv::Mat cell = cv::Mat(cv::Size(dist, dist), CV_8UC1);
         
         
         for (int y = 0; y < dist; y++) {
             uchar* ptr = cell.ptr(y);
             for (int x = 0; x < dist; x++) {
-                ptr[x] = cvThreshold.at<uchar>(y, x);
+                ptr[x] = cvaThreshold.at<uchar>(y, x);
             }
         }
-        std::cout << cvThreshold.rows << " " << cvThreshold.cols << std::endl;
+        std::cout << cvaThreshold.rows << " " << cvaThreshold.cols << std::endl;
         
         int number = dr->classify(cell);
 

@@ -76,8 +76,8 @@ const Scalar WHITE = Scalar(255,255,255);
     cout << trainLabelPath << endl;
     
     cv::Mat input = cv::imread(digitPath, CV_8UC1);
-    
-    cv::Mat cropped = crop_image(input);
+    Mat cropped = [self rectify:&input];
+//    cv::Mat cropped = crop_image(input);
     UIImage* cropped_view = MatToUIImage(cropped);
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
@@ -143,7 +143,7 @@ const Scalar WHITE = Scalar(255,255,255);
     // This starts the camera capture
 //    [photoCamera_ start];
 
-    UIImage *image = [UIImage imageNamed:@"sudoku.JPG"];
+    UIImage *image = [UIImage imageNamed:@"sudoku2.JPG"];
     if(image != nil) liveView_.image = [self findPuzzle:image];
     else cout << "Cannot read in the file" << endl;
     
@@ -269,8 +269,8 @@ const Scalar WHITE = Scalar(255,255,255);
             std::string digitPath = std::string([testPath UTF8String]);
 //            cout << digitPath << endl;
             cv::Mat input = cv::imread(digitPath, CV_8UC1);
-
-            cv::Mat cropped = crop_image(input);
+            Mat cropped = [self rectify:&input];
+//            cv::Mat cropped = crop_image(input);
 
             digit = recognize(cropped, dr);
             std::cout << "digit: " << digit << std::endl;
@@ -288,7 +288,7 @@ const Scalar WHITE = Scalar(255,255,255);
         cout << "solve:" << endl;
         printGrid(sudoku);
     } else {
-        printf("No solution exists");
+        cout << "No solution exists" << endl;
     }
     
 //    resImage = MatToUIImage(cvImageCopy);
@@ -302,8 +302,10 @@ const Scalar WHITE = Scalar(255,255,255);
 
 -(Mat)rectify:(Mat *)grid {
     Mat res;
-//    flip(*grid, res, -1);
-    res = *grid;
+    transpose(*grid, res);
+    flip(res, res, 1);
+
+//    res = *grid;
     return res;
 }
 
