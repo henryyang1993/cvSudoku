@@ -42,7 +42,7 @@ const Scalar WHITE = Scalar(255,255,255);
     string trainLabelPath;
     Mat ggrid;
     int digit;
-
+    int sudoku[N][N];
     UIImageView *imageView_;
     
 }
@@ -102,7 +102,7 @@ const Scalar WHITE = Scalar(255,255,255);
     
     bool b = dr->train(trainPath1, trainPath2);
     
-    digit = recognize(input, dr);
+    digit = recognize(cropped, dr);
     std::cout << "number: " << digit << std::endl;
     
     
@@ -253,8 +253,8 @@ const Scalar WHITE = Scalar(255,255,255);
     
     bool b = dr->train(trainPath1, trainPath2);
     
-    for (int i = 0; i < 1; i += 1) {
-        for (int j = 0; j < 1; j += 1) {
+    for (int i = 0; i < N; i += 1) {
+        for (int j = 0; j < N; j += 1) {
 //            Mat grid = cvImageCopy.rowRange(max(0, (int)(i * rowstep * 0.99)), min((int)((i + 1) * rowstep * 1.01), cvImageCopy.rows)).colRange(max(0, (int)(j * colstep * 0.99)), min((int)((j + 1) * colstep * 1.01), cvImageCopy.cols));
             int rrange = (int)rowstep * 0.2;
             int crange = (int)colstep * 0.1;
@@ -270,13 +270,25 @@ const Scalar WHITE = Scalar(255,255,255);
 //            cout << digitPath << endl;
             cv::Mat input = cv::imread(digitPath, CV_8UC1);
 
+            cv::Mat cropped = crop_image(input);
 
-            int digit = recognize(input, dr);
+            digit = recognize(cropped, dr);
             std::cout << "digit: " << digit << std::endl;
+            
+            sudoku[j][N - 1 - i] = digit;
 
 //            resImage = MatToUIImage([self findGridGray:&grid]);
 //            [self saveLocal:resImage mode:@"gray" row:i col:j];
         }
+    }
+    
+    cout << "original:" << endl;
+    printGrid(sudoku);
+    if (SolveSudoku(sudoku) == true) {
+        cout << "solve:" << endl;
+        printGrid(sudoku);
+    } else {
+        printf("No solution exists");
     }
     
 //    resImage = MatToUIImage(cvImageCopy);
