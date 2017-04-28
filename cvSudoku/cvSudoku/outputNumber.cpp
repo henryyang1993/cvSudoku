@@ -70,7 +70,7 @@ int recognize(Mat input, DigitRecognizer *dr) { //string imgPath, string lbPath
     //bool b = dr->train(trainImgPath, trainLbPath);
     
     if (black_pixels < 0.05) {
-        return -1;
+        return 0;
     } else {
         int dist = cvThreshold.rows;
         cv::Mat cell = cv::Mat(cv::Size(dist, dist), CV_8UC1);
