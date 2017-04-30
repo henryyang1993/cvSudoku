@@ -74,17 +74,17 @@ const Scalar WHITE = Scalar(255,255,255);
     dr->train(trainPath1, trainPath2);
     
     
-    // Recognizing image of hand-written digit 4 in the Resource folder
-    NSString *testPath = [[NSBundle mainBundle] pathForResource:@"gray02" ofType:@"jpg"];
-    std::string digitPath = std::string([testPath UTF8String]);
-    cout << digitPath << endl;
-
-    cv::Mat input = cv::imread(digitPath, CV_8UC1);
-    Mat croppe = input;
-//    Mat cropped = [self rectify:&input];
-
-    digit = recognize(cropped, dr);
-    std::cout << "init digit: " << digit << std::endl;
+//    // Recognizing image of hand-written digit 4 in the Resource folder
+//    NSString *testPath = [[NSBundle mainBundle] pathForResource:@"gray02" ofType:@"jpg"];
+//    std::string digitPath = std::string([testPath UTF8String]);
+//    cout << digitPath << endl;
+//
+//    cv::Mat input = cv::imread(digitPath, CV_8UC1);
+//    Mat cropped = input;
+////    Mat cropped = [self rectify:&input];
+//
+//    digit = recognize(cropped, dr);
+//    std::cout << "init digit: " << digit << std::endl;
     //-------------------------------------------------------------------------------------------------------------------------
 
     // 1. Setup the your OpenCV view, so it takes up the entire App screen......
@@ -104,15 +104,31 @@ const Scalar WHITE = Scalar(255,255,255);
     boardView_ = [[UIImageView alloc] initWithFrame:CGRectMake(w, h, view_width - 2 * w, view_width - 2 * w)];
     [resultView_ addSubview:boardView_]; // Important: add boardView_ as a subview
     //    boardView_.hidden = true; // Hide the view
-    int grid_w = (view_width - 2 * w) / 9;
+//    int grid_w = (view_width - 2 * w) / 9;
+    int grid_w = 59;
     cout << "grid width: " << grid_w << endl;
+    
+    int gw = 12;
+    int gh = 13;
+    int bw = 6;
+    int bh = 6;
     
     tfArray = [NSMutableArray new];
     for (int i = 0; i < N; i++) {
         tfArray[i] = [NSMutableArray new];
+        if (i && i % 3 == 0) {
+            gh += bh;
+//            bh += bh;
+        }
+        gw = 12;
         for (int j = 0; j < N; j++) {
-            UITextField *uitf = [[UITextField alloc] initWithFrame:CGRectMake(w + j * grid_w, h + i * grid_w, grid_w, grid_w)];
-            
+            if (j && j % 3 == 0) {
+                gw += bw;
+//                bw += bw;
+            }
+            UITextField *uitf = [[UITextField alloc] initWithFrame:CGRectMake(gw + j * grid_w + bw, gh + i * grid_w + bh, grid_w / 1.3, grid_w / 1.3)];
+            uitf.backgroundColor = [UIColor redColor];
+            uitf.keyboardType = UIKeyboardTypeNumberPad;
             tfArray[i][j] = uitf;
             [boardView_ addSubview:uitf];
         }
@@ -146,8 +162,8 @@ const Scalar WHITE = Scalar(255,255,255);
     //    [photoCamera_ start];
     
     UIImage *image = [UIImage imageNamed:@"sudoku.JPG"];
-    if(image != nil) [self findPuzzle:image];
-    else cout << "Cannot read in the image" << endl;
+//    if(image != nil) [self findPuzzle:image];
+//    else cout << "Cannot read in the image" << endl;
     
     // load board view
     UIImage *board = [UIImage imageNamed:@"board.JPG"];
@@ -283,6 +299,8 @@ const Scalar WHITE = Scalar(255,255,255);
             std::cout << "digit: " << digit << std::endl;
             
             sudoku[j][N - 1 - i] = digit;
+            UITextField *uitf = (UITextField *)tfArray[j][N - 1 - i];
+            uitf.backgroundColor = [UIColor blueColor];
 
 //            resImage = MatToUIImage([self findGridGray:&grid]);
 //            [self saveLocal:resImage mode:@"gray" row:i col:j];
