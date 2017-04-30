@@ -44,6 +44,7 @@ int recognize(Mat input, DigitRecognizer *dr) { //string imgPath, string lbPath
     Mat cropped;
 //    cropped = crop_image(input);
     cropped = input;
+    GaussianBlur(cropped, cropped, Size(11, 11), 0);
     
     //std::cout << "path to image: " << imgPath << std::endl;
     Mat cvOld;
@@ -54,6 +55,7 @@ int recognize(Mat input, DigitRecognizer *dr) { //string imgPath, string lbPath
     Mat cvThreshold = cvOld.clone();
     adaptiveThreshold(cvOld, cvaThreshold, 255, CV_ADAPTIVE_THRESH_GAUSSIAN_C, CV_THRESH_BINARY_INV, 101, 1.0);
     threshold(cvOld, cvThreshold, 150, 255, THRESH_BINARY_INV);
+    
     
     int count = 0;
     for (int i = 0; i < cvThreshold.rows; i++) {
@@ -82,8 +84,8 @@ int recognize(Mat input, DigitRecognizer *dr) { //string imgPath, string lbPath
     
     //bool b = dr->train(trainImgPath, trainLbPath);
     
-    if (black_pixels < 0.005) {
-        return 0;
+    if (black_pixels < 0.05) {
+        return -1;
     } else {
         int dist = cvaThreshold.rows;
         cv::Mat cell = cv::Mat(cv::Size(dist, dist), CV_8UC1);
