@@ -94,6 +94,7 @@
 		C8183FEB1EA835D10017677D /* gray86.jpg in Resources */ = {isa = PBXBuildFile; fileRef = C8183F9A1EA835D10017677D /* gray86.jpg */; };
 		C8183FEC1EA835D10017677D /* gray87.jpg in Resources */ = {isa = PBXBuildFile; fileRef = C8183F9B1EA835D10017677D /* gray87.jpg */; };
 		C8183FED1EA835D10017677D /* gray88.jpg in Resources */ = {isa = PBXBuildFile; fileRef = C8183F9C1EA835D10017677D /* gray88.jpg */; };
+		C84E99371EB3D8EE004E4401 /* sudoku2.JPG in Resources */ = {isa = PBXBuildFile; fileRef = C84E99361EB3D8EE004E4401 /* sudoku2.JPG */; };
 		C868EC9C1E9585DB008449A3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C868EC9B1E9585DB008449A3 /* main.m */; };
 		C868EC9F1E9585DB008449A3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C868EC9E1E9585DB008449A3 /* AppDelegate.m */; };
 		C868ECA21E9585DB008449A3 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = C868ECA11E9585DB008449A3 /* ViewController.mm */; };
@@ -199,6 +200,7 @@
 		C8183F9A1EA835D10017677D /* gray86.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = gray86.jpg; sourceTree = "<group>"; };
 		C8183F9B1EA835D10017677D /* gray87.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = gray87.jpg; sourceTree = "<group>"; };
 		C8183F9C1EA835D10017677D /* gray88.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = gray88.jpg; sourceTree = "<group>"; };
+		C84E99361EB3D8EE004E4401 /* sudoku2.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = sudoku2.JPG; sourceTree = "<group>"; };
 		C868EC971E9585DB008449A3 /* cvSudoku.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cvSudoku.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C868EC9B1E9585DB008449A3 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C868EC9D1E9585DB008449A3 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -369,6 +371,7 @@
 		C868EC9A1E9585DB008449A3 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				C84E99361EB3D8EE004E4401 /* sudoku2.JPG */,
 				C868ECBC1E95D35D008449A3 /* sudoku.JPG */,
 				C868ECB61E95B119008449A3 /* armadillo */,
 				C868ECB71E95B119008449A3 /* armadillo_bits */,
@@ -419,7 +422,6 @@
 				TargetAttributes = {
 					C868EC961E9585DB008449A3 = {
 						CreatedOnToolsVersion = 8.3;
-						DevelopmentTeam = LS84KU9524;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -502,6 +504,7 @@
 				C8183FB31EA835D10017677D /* gray24.jpg in Resources */,
 				C8183F9F1EA835D10017677D /* gray02.jpg in Resources */,
 				C8183FCD1EA835D10017677D /* gray53.jpg in Resources */,
+				C84E99371EB3D8EE004E4401 /* sudoku2.JPG in Resources */,
 				C8183FC51EA835D10017677D /* gray44.jpg in Resources */,
 				C8183FCB1EA835D10017677D /* gray51.jpg in Resources */,
 				C8183FA91EA835D10017677D /* gray13.jpg in Resources */,
@@ -675,7 +678,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = LS84KU9524;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					/usr/local/lib,
@@ -699,7 +702,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = LS84KU9524;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					/usr/local/lib,
