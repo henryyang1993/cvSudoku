@@ -35,7 +35,8 @@ const Scalar WHITE = Scalar(255,255,255);
 @interface ViewController ()
 {
     UIImageView *liveView_; // Live output from the camera
-    UIImageView *resultView_; // Preview view of everything...
+    UIView *resultView_; // result UIView
+    UIImageView *boardView_; // sudoku UIImageView
     UIButton *takephotoButton_, *goliveButton_; // Button to initiate OpenCV processing of image
     CvPhotoCamera *photoCamera_; // OpenCV wrapper class to simplfy camera access through AVFoundation
     string trainImgPath;
@@ -43,8 +44,8 @@ const Scalar WHITE = Scalar(255,255,255);
     Mat ggrid;
     int digit;
     int sudoku[N][N];
-    UIImageView *imageView_;
-    
+    DigitRecognizer *dr;
+    NSMutableArray *tfArray;
 }
 @end
 
@@ -52,20 +53,9 @@ const Scalar WHITE = Scalar(255,255,255);
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     // Do any additional setup after loading the view, typically from a nib.
-    // Do any additional setup after loading the view, typically from a nib.
-    
-    // 1. Setup the your OpenCV view, so it takes up the entire App screen......
-    int view_width = self.view.frame.size.width;
-    int view_height = (640*view_width)/480; // Work out the viw-height assuming 640x480 input
     
     //---------------------------testing digit recognition from input image files---------------------------------------------
-    
-    // Recognizing image of hand-written digit 4 in the Resource folder
-    NSString *testPath = [[NSBundle mainBundle] pathForResource:@"gray02" ofType:@"jpg"];
-    std::string digitPath = std::string([testPath UTF8String]);
-    cout << digitPath << endl;
     
     NSString *imgPath = [[NSBundle mainBundle] pathForResource:@"train-images.idx3-ubyte" ofType:@""];
     trainImgPath = std::string([imgPath UTF8String]);
@@ -75,46 +65,55 @@ const Scalar WHITE = Scalar(255,255,255);
     trainLabelPath = std::string([labelPath UTF8String]);
     cout << trainLabelPath << endl;
     
-    cv::Mat input = cv::imread(digitPath, CV_8UC1);
-    Mat cropped = [self rectify:&input];
-//    cv::Mat cropped = crop_image(input);
-    UIImage* cropped_view = MatToUIImage(cropped);
-    [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
-    
-    // 1. Setup the your OpenCV view, so it takes up the entire App screen......
-    imageView_ = [[UIImageView alloc] initWithFrame:CGRectMake(0.0, 0.0, self.view.frame.size.width-100, self.view.frame.size.height-100)];
-    [imageView_ setContentMode:UIViewContentModeScaleAspectFit];
-    
-    
-    // 2. Important: add OpenCV_View as a subview
-    [self.view addSubview:imageView_];
-    
-    // 3.Read in the image (of the famous Lena)
-    if(cropped_view != nil) imageView_.image = cropped_view;
-    
-    
-    DigitRecognizer *dr = new DigitRecognizer();
+    dr = new DigitRecognizer();
     
     const char *trainPath1 = trainImgPath.c_str();
     const char *trainPath2 = trainLabelPath.c_str();
     
-    
-    bool b = dr->train(trainPath1, trainPath2);
-    
-    digit = recognize(cropped, dr);
-    std::cout << "number: " << digit << std::endl;
-    
+    dr->train(trainPath1, trainPath2);
+
+//    // Recognizing image of hand-written digit 4 in the Resource folder
+//    NSString *testPath = [[NSBundle mainBundle] pathForResource:@"gray02" ofType:@"jpg"];
+//    std::string digitPath = std::string([testPath UTF8String]);
+//    cout << digitPath << endl;
+//    
+//    cv::Mat input = cv::imread(digitPath, CV_8UC1);
+////    Mat cropped = [self rectify:&input];
+//    
+//    digit = recognize(input, dr);
+//    std::cout << "init digit: " << digit << std::endl;
     
     //-------------------------------------------------------------------------------------------------------------------------
     
+    // 1. Setup the your OpenCV view, so it takes up the entire App screen......
+    int view_width = self.view.frame.size.width;
+    int view_height = (640*view_width)/480; // Work out the viw-height assuming 640x480 input
     
     liveView_ = [[UIImageView alloc] initWithFrame:CGRectMake(0.0, 0.0, view_width, view_height)];
-    [self.view addSubview:liveView_]; // Important: add liveView_ as a subview
+//    [self.view addSubview:liveView_]; // Important: add liveView_ as a subview
+    liveView_.hidden = true;
     
-    resultView_ = [[UIImageView alloc] initWithFrame:CGRectMake(0.0, 0.0, view_width, view_height)];
+    resultView_ = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, view_width, view_height)];
     [self.view addSubview:resultView_]; // Important: add resultView_ as a subview
-    resultView_.hidden = true; // Hide the view
+//    resultView_.hidden = true; // Hide the view
+    
+    int w = 100;
+    int h = 50;
+    boardView_ = [[UIImageView alloc] initWithFrame:CGRectMake(w, h, view_width - 2 * w, view_width - 2 * w)];
+    [resultView_ addSubview:boardView_]; // Important: add boardView_ as a subview
+//    boardView_.hidden = true; // Hide the view
+    int grid_w = (view_width - 2 * w) / 9;
+    cout << "grid width: " << grid_w << endl;
+    
+//    tfArray = [[NSMutableArray alloc] initWithCapacity: N];
+//    for (int i = 0; i < N; i++) {
+//        [tfArray insertObject:[NSMutableArray arrayWithCapacity:N] atIndex:N];
+//        for (int j = 0; j < N; j++) {
+//            UITextField *uitf = [[UITextField alloc] initWithFrame:CGRectMake(w + j * grid_w, h + i * grid_w, grid_w, grid_w)];
+//            textFields = [textFields arrayByAddingObject:uitf];
+//            [boardView_ addSubview:uitf];
+//        }
+//    }
     
     // 2. First setup a button to take a single picture
     takephotoButton_ = [self simpleButton:@"Take Photo" buttonColor:[UIColor redColor]];
@@ -143,14 +142,24 @@ const Scalar WHITE = Scalar(255,255,255);
     // This starts the camera capture
 //    [photoCamera_ start];
 
+<<<<<<< HEAD
     UIImage *image = [UIImage imageNamed:@"sudoku.JPG"];
     if(image != nil) liveView_.image = [self findPuzzle:image];
     else cout << "Cannot read in the file" << endl;
+=======
+//    UIImage *image = [UIImage imageNamed:@"sudoku.JPG"];
+//    if(image != nil) [self findPuzzle:image];
+//    else cout << "Cannot read in the image" << endl;
+>>>>>>> 7b403c2a61207b63f9b88413af68ec485901a87d
     
+    // load board view
+    UIImage *board = [UIImage imageNamed:@"board.JPG"];
+    if(board != nil) boardView_.image = board;
+    else cout << "Cannot read in the board" << endl;
 }
 
--(UIImage *)findPuzzle:(UIImage *)image {
-    UIImage *resImage;
+-(void)findPuzzle:(UIImage *)image {
+//    UIImage *resImage;
     cv::Mat cvImage, cvImageCopy;
     UIImageToMat(image, cvImage);
     cvImage.copyTo(cvImageCopy);
@@ -246,12 +255,12 @@ const Scalar WHITE = Scalar(255,255,255);
     int colstep = cvImageCopy.cols / 9;
     
     
-    DigitRecognizer *dr = new DigitRecognizer();
+//    DigitRecognizer *dr = new DigitRecognizer();
     
-    const char *trainPath1 = trainImgPath.c_str();
-    const char *trainPath2 = trainLabelPath.c_str();
+//    const char *trainPath1 = trainImgPath.c_str();
+//    const char *trainPath2 = trainLabelPath.c_str();
     
-    bool b = dr->train(trainPath1, trainPath2);
+//    bool b = dr->train(trainPath1, trainPath2);
     
     for (int i = 0; i < N; i += 1) {
         for (int j = 0; j < N; j += 1) {
@@ -260,16 +269,21 @@ const Scalar WHITE = Scalar(255,255,255);
             int crange = (int)colstep * 0.1;
             Mat grid = cvImageCopy.rowRange(i * rowstep + rrange, (i + 1) * rowstep - rrange).colRange(j * colstep + crange, (j + 1) * colstep - crange);
             cout << "loop: " << i << " " << j << endl;
-//            ggrid = [self findGridGray:&grid];
+            ggrid = [self findGridGray:&grid];
 //            Mat input = [self rectify:&ggrid];
 //            resImage = MatToUIImage(input);
             
-            NSString *filename = [NSString stringWithFormat:@"gray%d%d", i, j];
-            NSString *testPath = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
-            std::string digitPath = std::string([testPath UTF8String]);
+//            NSString *filename = [NSString stringWithFormat:@"gray%d%d", i, j];
+//            NSString *testPath = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
+//            std::string digitPath = std::string([testPath UTF8String]);
 //            cout << digitPath << endl;
+<<<<<<< HEAD
             cv::Mat input = cv::imread(digitPath, CV_8UC1);
             Mat cropped = input; //[self rectify:&input];
+=======
+//            cv::Mat input = cv::imread(digitPath, CV_8UC1);
+            Mat cropped = [self rectify:&ggrid];
+>>>>>>> 7b403c2a61207b63f9b88413af68ec485901a87d
 //            cv::Mat cropped = crop_image(input);
 
             digit = recognize(cropped, dr);
@@ -294,10 +308,10 @@ const Scalar WHITE = Scalar(255,255,255);
 //    resImage = MatToUIImage(cvImageCopy);
 
     // Special part to ensure the image is rotated properly when the image is converted back
-    UIImage *retImage = [UIImage imageWithCGImage:[resImage CGImage] scale:1.0 orientation:UIImageOrientationRight];
+//    UIImage *retImage = [UIImage imageWithCGImage:[resImage CGImage] scale:1.0 orientation:UIImageOrientationRight];
     
 //    return resImage;
-    return retImage;
+//    return retImage;
 }
 
 -(Mat)rectify:(Mat *)grid {
@@ -395,7 +409,7 @@ const Scalar WHITE = Scalar(255,255,255);
     [photoCamera_ stop];
     resultView_.hidden = false; // Turn the hidden view on
     
-    resultView_.image = [self findPuzzle:image];
+    [self findPuzzle:image];
     
     [takephotoButton_ setHidden:true]; [goliveButton_ setHidden:false]; // Switch visibility of buttons
 }

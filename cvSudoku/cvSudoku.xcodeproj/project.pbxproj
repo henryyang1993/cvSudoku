@@ -108,6 +108,7 @@
 		C868ECBD1E95D35D008449A3 /* sudoku.JPG in Resources */ = {isa = PBXBuildFile; fileRef = C868ECBC1E95D35D008449A3 /* sudoku.JPG */; };
 		C868ECC31E99FCC9008449A3 /* solver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C868ECC11E99FCC9008449A3 /* solver.cpp */; };
 		C87D5A301E9AA8DA0061CDEF /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C87D5A2F1E9AA8DA0061CDEF /* opencv2.framework */; };
+		C888B00B1EB5674C009D7F0E /* board.JPG in Resources */ = {isa = PBXBuildFile; fileRef = C888B00A1EB5674C009D7F0E /* board.JPG */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -219,6 +220,7 @@
 		C868ECC11E99FCC9008449A3 /* solver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = solver.cpp; sourceTree = "<group>"; };
 		C868ECC51E99FE16008449A3 /* solver.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = solver.hpp; sourceTree = "<group>"; };
 		C87D5A2F1E9AA8DA0061CDEF /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
+		C888B00A1EB5674C009D7F0E /* board.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = board.JPG; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -371,6 +373,7 @@
 		C868EC9A1E9585DB008449A3 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				C888B00A1EB5674C009D7F0E /* board.JPG */,
 				C84E99361EB3D8EE004E4401 /* sudoku2.JPG */,
 				C868ECBC1E95D35D008449A3 /* sudoku.JPG */,
 				C868ECB61E95B119008449A3 /* armadillo */,
@@ -453,6 +456,7 @@
 				C8183FAA1EA835D10017677D /* gray14.jpg in Resources */,
 				C8183FEB1EA835D10017677D /* gray86.jpg in Resources */,
 				C8183FDF1EA835D10017677D /* gray73.jpg in Resources */,
+				C888B00B1EB5674C009D7F0E /* board.JPG in Resources */,
 				C8183FC41EA835D10017677D /* gray43.jpg in Resources */,
 				C8183FA61EA835D10017677D /* gray10.jpg in Resources */,
 				C8183FB71EA835D10017677D /* gray28.jpg in Resources */,
