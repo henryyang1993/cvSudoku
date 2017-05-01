@@ -425,6 +425,7 @@
 				TargetAttributes = {
 					C868EC961E9585DB008449A3 = {
 						CreatedOnToolsVersion = 8.3;
+						DevelopmentTeam = 3C62WZH69H;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -682,7 +683,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 3C62WZH69H;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					/usr/local/lib,
@@ -696,7 +697,7 @@
 					/Users/yanghanyu/XcodeProject/cvapps/cvSudoku,
 					"$(PROJECT_DIR)/cvSudoku",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = xis.cvSudoku;
+				PRODUCT_BUNDLE_IDENTIFIER = henry.cvSudoku;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -706,7 +707,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = 3C62WZH69H;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					/usr/local/lib,
@@ -720,7 +721,7 @@
 					/Users/yanghanyu/XcodeProject/cvapps/cvSudoku,
 					"$(PROJECT_DIR)/cvSudoku",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = xis.cvSudoku;
+				PRODUCT_BUNDLE_IDENTIFIER = henry.cvSudoku;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

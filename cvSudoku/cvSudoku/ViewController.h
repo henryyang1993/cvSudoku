@@ -13,7 +13,7 @@
 #import "opencv2/highgui/ios.h"
 #endif
 
-@interface ViewController : UIViewController<CvPhotoCameraDelegate>
+@interface ViewController : UIViewController<CvPhotoCameraDelegate, UITextFieldDelegate>
 
 
 @end

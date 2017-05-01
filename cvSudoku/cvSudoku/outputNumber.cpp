@@ -71,8 +71,8 @@ int recognize(Mat input, DigitRecognizer *dr) { //string imgPath, string lbPath
     cout << "cvaThreshold" << endl;
     cout << cvaThreshold << endl;
     
-    cout << "cvThreshold" << endl;
-    cout << cvThreshold << endl;
+//    cout << "cvThreshold" << endl;
+//    cout << cvThreshold << endl;
     
     double black_pixels = 1 - count/(double)(cvThreshold.rows*cvThreshold.cols);
     cout << "black percentage: " << black_pixels << endl;

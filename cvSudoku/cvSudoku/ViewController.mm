@@ -92,12 +92,11 @@ const Scalar WHITE = Scalar(255,255,255);
     int view_height = (640*view_width)/480; // Work out the viw-height assuming 640x480 input
     
     liveView_ = [[UIImageView alloc] initWithFrame:CGRectMake(0.0, 0.0, view_width, view_height)];
-    //    [self.view addSubview:liveView_]; // Important: add liveView_ as a subview
-    liveView_.hidden = true;
+    [self.view addSubview:liveView_]; // Important: add liveView_ as a subview
     
     resultView_ = [[UIView alloc] initWithFrame:CGRectMake(0.0, 0.0, view_width, view_height)];
     [self.view addSubview:resultView_]; // Important: add resultView_ as a subview
-    //    resultView_.hidden = true; // Hide the view
+    
     
     int w = 100;
     int h = 50;
@@ -108,8 +107,8 @@ const Scalar WHITE = Scalar(255,255,255);
     int grid_w = 59;
     cout << "grid width: " << grid_w << endl;
     
-    int gw = 12;
-    int gh = 13;
+    int gw = w + 12;
+    int gh = h + 13;
     int bw = 6;
     int bh = 6;
     
@@ -120,17 +119,17 @@ const Scalar WHITE = Scalar(255,255,255);
             gh += bh;
 //            bh += bh;
         }
-        gw = 12;
+        gw = w + 12;
         for (int j = 0; j < N; j++) {
             if (j && j % 3 == 0) {
                 gw += bw;
 //                bw += bw;
             }
             UITextField *uitf = [[UITextField alloc] initWithFrame:CGRectMake(gw + j * grid_w + bw, gh + i * grid_w + bh, grid_w / 1.3, grid_w / 1.3)];
-            uitf.backgroundColor = [UIColor redColor];
+            uitf.backgroundColor = [UIColor blueColor];
             uitf.keyboardType = UIKeyboardTypeNumberPad;
             tfArray[i][j] = uitf;
-            [boardView_ addSubview:uitf];
+            [resultView_ addSubview:uitf];
         }
     }
     
@@ -143,7 +142,6 @@ const Scalar WHITE = Scalar(255,255,255);
     goliveButton_ = [self simpleButton:@"Go Live" buttonColor:[UIColor greenColor]];
     // Important part that connects the action to the member function buttonWasPressed
     [goliveButton_ addTarget:self action:@selector(liveWasPressed) forControlEvents:UIControlEventTouchUpInside];
-    [goliveButton_ setHidden:true]; // Hide the button
     
     // 4. Initialize the camera parameters and start the camera (inside the App)
     photoCamera_ = [[CvPhotoCamera alloc] initWithParentView:liveView_];
@@ -159,11 +157,19 @@ const Scalar WHITE = Scalar(255,255,255);
     photoCamera_.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait;
     
     // This starts the camera capture
-    //    [photoCamera_ start];
+//    [photoCamera_ start];
+//    resultView_.hidden = true;
+//    liveView_.hidden = false;
+//    takephotoButton_.hidden = false;
+//    goliveButton_.hidden = true;
     
     UIImage *image = [UIImage imageNamed:@"sudoku.JPG"];
     if(image != nil) [self findPuzzle:image];
     else cout << "Cannot read in the image" << endl;
+    resultView_.hidden = false;
+    liveView_.hidden = true;
+    takephotoButton_.hidden = true;
+    goliveButton_.hidden = false;
     
     // load board view
     UIImage *board = [UIImage imageNamed:@"board.JPG"];
@@ -302,20 +308,22 @@ const Scalar WHITE = Scalar(255,255,255);
             }
             
             UITextField *uitf = (UITextField *)tfArray[j][N - 1 - i];
+            uitf.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+            uitf.textAlignment = NSTextAlignmentCenter;
+            uitf.font = [uitf.font fontWithSize:30.0];
             if (digit == -1) {
                 sudoku[j][N - 1 - i] = 0;
+                uitf.placeholder = @"0";
                 uitf.backgroundColor = [UIColor blueColor];
                 uitf.enabled = true;
+                uitf.delegate = self;
             } else {
                 sudoku[j][N - 1 - i] = digit;
-                uitf.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-                uitf.textAlignment = NSTextAlignmentCenter;
-                uitf.font = [uitf.font fontWithSize:30.0];
                 uitf.text = [NSString stringWithFormat:@"%d", digit];
+                uitf.backgroundColor = [UIColor greenColor];
                 uitf.enabled = false;
             }
             
-
 //            resImage = MatToUIImage([self findGridGray:&grid]);
 //            [self saveLocal:resImage mode:@"gray" row:i col:j];
         }
@@ -326,6 +334,14 @@ const Scalar WHITE = Scalar(255,255,255);
     if (SolveSudoku(sudoku) == true) {
         cout << "solve:" << endl;
         printGrid(sudoku);
+        for (int i = 0; i < N; i += 1) {
+            for (int j = 0; j < N; j += 1) {
+                UITextField *uitf = (UITextField *)tfArray[i][j];
+                if ([uitf.placeholder isEqualToString:@"0"]) {
+                    uitf.attributedPlaceholder = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%d", sudoku[i][j]] attributes:@{NSForegroundColorAttributeName:[UIColor blueColor]}];
+                }
+            }
+        }
     } else {
         cout << "No solution exists" << endl;
     }
@@ -415,6 +431,103 @@ const Scalar WHITE = Scalar(255,255,255);
     NSLog(@"Documents directory: %@", [fileMgr contentsOfDirectoryAtPath:documentsDirectory error:&error]);
 }
 
+
+// UITextField delegates
+-(BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
+    
+    NSString *ans = textField.placeholder;
+    UIColor *col = textField.backgroundColor;
+    textField.attributedPlaceholder = [[NSAttributedString alloc] initWithString:ans attributes:@{NSForegroundColorAttributeName:col}];
+    
+    // Check for non-numeric characters
+    NSUInteger lengthOfString = string.length;
+    for (NSInteger loopIndex = 0; loopIndex < lengthOfString; loopIndex++) {
+        unichar character = [string characterAtIndex:loopIndex];
+        if (character < 49) return NO; // 49 unichar for 1
+        if (character > 57) return NO; // 57 unichar for 9
+    }
+    
+    // Check for total length
+    NSUInteger proposedNewLength = textField.text.length - range.length + string.length;
+    if (proposedNewLength > 1) return NO;     //set your length here
+    if (proposedNewLength == 0) {
+        textField.backgroundColor = [UIColor blueColor];
+        textField.attributedPlaceholder = [[NSAttributedString alloc] initWithString:ans attributes:@{NSForegroundColorAttributeName:[UIColor blueColor]}];
+    }
+    return YES;
+}
+
+-(BOOL) textFieldShouldReturn:(UITextField *)textField {
+    [textField resignFirstResponder];
+    NSString *ans = textField.placeholder;
+    if (textField.text.length > 0) {
+        if ([textField.text isEqualToString:ans]) {
+            textField.backgroundColor = [UIColor greenColor];
+            [self showMessage:@"correct!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor greenColor]];
+            cout << "correct!!!" << endl;
+            textField.enabled = false;
+            [self congratulation];
+        } else {
+            textField.backgroundColor = [UIColor redColor];
+            [self showMessage:@"incorrect!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor]];
+            cout << "incorrect!!" << endl;
+        }
+    }
+    return YES;
+}
+
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+    [textField resignFirstResponder];
+    NSString *ans = textField.placeholder;
+    if (textField.text.length > 0) {
+        if ([textField.text isEqualToString:ans]) {
+            textField.backgroundColor = [UIColor greenColor];
+            [self showMessage:@"correct!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor greenColor]];
+            cout << "correct!!!" << endl;
+            textField.enabled = false;
+            [self congratulation];
+        } else {
+            textField.backgroundColor = [UIColor redColor];
+            [self showMessage:@"incorrect!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor]];
+            cout << "incorrect!!" << endl;
+        }
+    }
+}
+
+-(void) congratulation {
+    for (int i = 0; i < N; i += 1) {
+        for (int j = 0; j < N; j += 1) {
+            UITextField *uitf = (UITextField *)tfArray[i][j];
+            if (uitf.backgroundColor != [UIColor greenColor]) {
+                return ;
+            }
+        }
+    }
+    [self showMessage:@"Congratulations!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3 + 40) atColor:[UIColor blueColor]];
+}
+
+- (void)showMessage:(NSString*)message atPoint:(CGPoint)point atColor:(UIColor*)color {
+    const CGFloat fontSize = 32;
+    
+    UILabel* label = [[UILabel alloc] initWithFrame:CGRectZero];
+    label.backgroundColor = [UIColor clearColor];
+    label.font = [UIFont fontWithName:@"Helvetica-Bold" size:fontSize];
+    label.text = message;
+    label.textColor = color;
+    [label sizeToFit];
+    
+    label.center = point;
+    
+    [self.view addSubview:label];
+    
+    [UIView animateWithDuration:0.3 delay:1 options:0 animations:^{
+        label.alpha = 0;
+    } completion:^(BOOL finished) {
+        label.hidden = YES;
+        [label removeFromSuperview];
+    }];
+}
+
 //===============================================================================================
 // This member function is executed when the button is pressed
 - (void)buttonWasPressed {
@@ -424,6 +537,7 @@ const Scalar WHITE = Scalar(255,255,255);
 // This member function is executed when the button is pressed
 - (void)liveWasPressed {
     [takephotoButton_ setHidden:false]; [goliveButton_ setHidden:true]; // Switch visibility of buttons
+    liveView_.hidden = false;
     resultView_.hidden = true; // Hide the result view again
     [photoCamera_ start];
 }
@@ -432,6 +546,7 @@ const Scalar WHITE = Scalar(255,255,255);
 - (void)photoCamera:(CvPhotoCamera *)photoCamera capturedImage:(UIImage *)image
 {
     [photoCamera_ stop];
+    liveView_.hidden = true;
     resultView_.hidden = false; // Turn the hidden view on
     
     [self findPuzzle:image];
