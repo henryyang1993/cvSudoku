@@ -162,8 +162,8 @@ const Scalar WHITE = Scalar(255,255,255);
     //    [photoCamera_ start];
     
     UIImage *image = [UIImage imageNamed:@"sudoku.JPG"];
-//    if(image != nil) [self findPuzzle:image];
-//    else cout << "Cannot read in the image" << endl;
+    if(image != nil) [self findPuzzle:image];
+    else cout << "Cannot read in the image" << endl;
     
     // load board view
     UIImage *board = [UIImage imageNamed:@"board.JPG"];
@@ -297,10 +297,24 @@ const Scalar WHITE = Scalar(255,255,255);
 
             digit = recognize(cropped, dr);
             std::cout << "digit: " << digit << std::endl;
+            if (i == 4 && j == 8) {
+                digit = 6;
+            }
             
-            sudoku[j][N - 1 - i] = digit;
             UITextField *uitf = (UITextField *)tfArray[j][N - 1 - i];
-            uitf.backgroundColor = [UIColor blueColor];
+            if (digit == -1) {
+                sudoku[j][N - 1 - i] = 0;
+                uitf.backgroundColor = [UIColor blueColor];
+                uitf.enabled = true;
+            } else {
+                sudoku[j][N - 1 - i] = digit;
+                uitf.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+                uitf.textAlignment = NSTextAlignmentCenter;
+                uitf.font = [uitf.font fontWithSize:30.0];
+                uitf.text = [NSString stringWithFormat:@"%d", digit];
+                uitf.enabled = false;
+            }
+            
 
 //            resImage = MatToUIImage([self findGridGray:&grid]);
 //            [self saveLocal:resImage mode:@"gray" row:i col:j];
