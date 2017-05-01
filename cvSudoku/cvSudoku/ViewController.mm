@@ -289,23 +289,18 @@ const Scalar WHITE = Scalar(255,255,255);
             int crange = (int)colstep * 0.1;
             Mat grid = cvImageCopy.rowRange(i * rowstep + rrange, (i + 1) * rowstep - rrange).colRange(j * colstep + crange, (j + 1) * colstep - crange);
             cout << "loop: " << i << " " << j << endl;
-//            ggrid = [self findGridGray:&grid];
-//            Mat input = [self rectify:&ggrid];
+            ggrid = [self findGridGray:&grid];
+            Mat cropped = [self rectify:&ggrid];
 //            resImage = MatToUIImage(input);
             
-            NSString *filename = [NSString stringWithFormat:@"gray%d%d", i, j];
-            NSString *testPath = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
-            std::string digitPath = std::string([testPath UTF8String]);
+//            NSString *filename = [NSString stringWithFormat:@"gray%d%d", i, j];
+//            NSString *testPath = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
+//            std::string digitPath = std::string([testPath UTF8String]);
 //            cout << digitPath << endl;
-            cv::Mat input = cv::imread(digitPath, CV_8UC1);
-            Mat cropped = input; //[self rectify:&input];
-//            cv::Mat cropped = crop_image(input);
-
+//            cv::Mat cropped = cv::imread(digitPath, CV_8UC1);
+            
             digit = recognize(cropped, dr);
             std::cout << "digit: " << digit << std::endl;
-            if (i == 4 && j == 8) {
-                digit = 6;
-            }
             
             UITextField *uitf = (UITextField *)tfArray[j][N - 1 - i];
             uitf.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
@@ -332,6 +327,7 @@ const Scalar WHITE = Scalar(255,255,255);
     cout << "original:" << endl;
     printGrid(sudoku);
     if (SolveSudoku(sudoku) == true) {
+        [self showMessage:@"Let's Start!!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor] keep:false];
         cout << "solve:" << endl;
         printGrid(sudoku);
         for (int i = 0; i < N; i += 1) {
@@ -343,7 +339,15 @@ const Scalar WHITE = Scalar(255,255,255);
             }
         }
     } else {
+        [self showMessage:@"No solution!!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor] keep:true];
         cout << "No solution exists" << endl;
+        for (int i = 0; i < N; i += 1) {
+            for (int j = 0; j < N; j += 1) {
+                UITextField *uitf = (UITextField *)tfArray[i][j];
+                uitf.placeholder = @"";
+                uitf.enabled = false;
+            }
+        }
     }
     
 //    resImage = MatToUIImage(cvImageCopy);
@@ -463,13 +467,13 @@ const Scalar WHITE = Scalar(255,255,255);
     if (textField.text.length > 0) {
         if ([textField.text isEqualToString:ans]) {
             textField.backgroundColor = [UIColor greenColor];
-            [self showMessage:@"correct!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor greenColor]];
+            [self showMessage:@"correct!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor greenColor] keep:false];
             cout << "correct!!!" << endl;
             textField.enabled = false;
             [self congratulation];
         } else {
             textField.backgroundColor = [UIColor redColor];
-            [self showMessage:@"incorrect!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor]];
+            [self showMessage:@"incorrect!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor] keep:false];
             cout << "incorrect!!" << endl;
         }
     }
@@ -482,13 +486,13 @@ const Scalar WHITE = Scalar(255,255,255);
     if (textField.text.length > 0) {
         if ([textField.text isEqualToString:ans]) {
             textField.backgroundColor = [UIColor greenColor];
-            [self showMessage:@"correct!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor greenColor]];
+            [self showMessage:@"correct!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor greenColor] keep:false];
             cout << "correct!!!" << endl;
             textField.enabled = false;
             [self congratulation];
         } else {
             textField.backgroundColor = [UIColor redColor];
-            [self showMessage:@"incorrect!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor]];
+            [self showMessage:@"incorrect!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor] keep:false];
             cout << "incorrect!!" << endl;
         }
     }
@@ -503,10 +507,10 @@ const Scalar WHITE = Scalar(255,255,255);
             }
         }
     }
-    [self showMessage:@"Congratulations!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3 + 40) atColor:[UIColor blueColor]];
+    [self showMessage:@"Congratulations!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3 + 40) atColor:[UIColor blueColor] keep:true];
 }
 
-- (void)showMessage:(NSString*)message atPoint:(CGPoint)point atColor:(UIColor*)color {
+- (void)showMessage:(NSString*)message atPoint:(CGPoint)point atColor:(UIColor*)color keep:(bool)keep {
     const CGFloat fontSize = 32;
     
     UILabel* label = [[UILabel alloc] initWithFrame:CGRectZero];
@@ -519,8 +523,13 @@ const Scalar WHITE = Scalar(255,255,255);
     label.center = point;
     
     [self.view addSubview:label];
-    
-    [UIView animateWithDuration:0.3 delay:1 options:0 animations:^{
+    NSTimeInterval nsti;
+    if (keep) {
+        nsti = 5;
+    } else {
+        nsti = 1;
+    }
+    [UIView animateWithDuration:1 delay:nsti options:0 animations:^{
         label.alpha = 0;
     } completion:^(BOOL finished) {
         label.hidden = YES;
