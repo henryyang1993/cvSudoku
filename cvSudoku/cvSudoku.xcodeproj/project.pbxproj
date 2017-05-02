@@ -95,6 +95,7 @@
 		C8183FEC1EA835D10017677D /* gray87.jpg in Resources */ = {isa = PBXBuildFile; fileRef = C8183F9B1EA835D10017677D /* gray87.jpg */; };
 		C8183FED1EA835D10017677D /* gray88.jpg in Resources */ = {isa = PBXBuildFile; fileRef = C8183F9C1EA835D10017677D /* gray88.jpg */; };
 		C84E99371EB3D8EE004E4401 /* sudoku2.JPG in Resources */ = {isa = PBXBuildFile; fileRef = C84E99361EB3D8EE004E4401 /* sudoku2.JPG */; };
+		C855745A1EB9141800EF2340 /* training in Resources */ = {isa = PBXBuildFile; fileRef = C85574591EB9141800EF2340 /* training */; };
 		C868EC9C1E9585DB008449A3 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = C868EC9B1E9585DB008449A3 /* main.m */; };
 		C868EC9F1E9585DB008449A3 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = C868EC9E1E9585DB008449A3 /* AppDelegate.m */; };
 		C868ECA21E9585DB008449A3 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = C868ECA11E9585DB008449A3 /* ViewController.mm */; };
@@ -105,7 +106,6 @@
 		C868ECB81E95B119008449A3 /* armadillo in Resources */ = {isa = PBXBuildFile; fileRef = C868ECB61E95B119008449A3 /* armadillo */; };
 		C868ECB91E95B119008449A3 /* armadillo_bits in Resources */ = {isa = PBXBuildFile; fileRef = C868ECB71E95B119008449A3 /* armadillo_bits */; };
 		C868ECBB1E95B24A008449A3 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C868ECBA1E95B24A008449A3 /* AVFoundation.framework */; };
-		C868ECBD1E95D35D008449A3 /* sudoku.JPG in Resources */ = {isa = PBXBuildFile; fileRef = C868ECBC1E95D35D008449A3 /* sudoku.JPG */; };
 		C868ECC31E99FCC9008449A3 /* solver.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C868ECC11E99FCC9008449A3 /* solver.cpp */; };
 		C87D5A301E9AA8DA0061CDEF /* opencv2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C87D5A2F1E9AA8DA0061CDEF /* opencv2.framework */; };
 		C888B00B1EB5674C009D7F0E /* board.JPG in Resources */ = {isa = PBXBuildFile; fileRef = C888B00A1EB5674C009D7F0E /* board.JPG */; };
@@ -202,6 +202,7 @@
 		C8183F9B1EA835D10017677D /* gray87.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = gray87.jpg; sourceTree = "<group>"; };
 		C8183F9C1EA835D10017677D /* gray88.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = gray88.jpg; sourceTree = "<group>"; };
 		C84E99361EB3D8EE004E4401 /* sudoku2.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = sudoku2.JPG; sourceTree = "<group>"; };
+		C85574591EB9141800EF2340 /* training */ = {isa = PBXFileReference; lastKnownFileType = folder; path = training; sourceTree = "<group>"; };
 		C868EC971E9585DB008449A3 /* cvSudoku.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = cvSudoku.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C868EC9B1E9585DB008449A3 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		C868EC9D1E9585DB008449A3 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -216,7 +217,6 @@
 		C868ECB61E95B119008449A3 /* armadillo */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = armadillo; sourceTree = "<group>"; };
 		C868ECB71E95B119008449A3 /* armadillo_bits */ = {isa = PBXFileReference; lastKnownFileType = folder; path = armadillo_bits; sourceTree = "<group>"; };
 		C868ECBA1E95B24A008449A3 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
-		C868ECBC1E95D35D008449A3 /* sudoku.JPG */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = sudoku.JPG; sourceTree = "<group>"; };
 		C868ECC11E99FCC9008449A3 /* solver.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = solver.cpp; sourceTree = "<group>"; };
 		C868ECC51E99FE16008449A3 /* solver.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = solver.hpp; sourceTree = "<group>"; };
 		C87D5A2F1E9AA8DA0061CDEF /* opencv2.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = opencv2.framework; sourceTree = "<group>"; };
@@ -373,9 +373,9 @@
 		C868EC9A1E9585DB008449A3 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				C85574591EB9141800EF2340 /* training */,
 				C888B00A1EB5674C009D7F0E /* board.JPG */,
 				C84E99361EB3D8EE004E4401 /* sudoku2.JPG */,
-				C868ECBC1E95D35D008449A3 /* sudoku.JPG */,
 				C868ECB61E95B119008449A3 /* armadillo */,
 				C868ECB71E95B119008449A3 /* armadillo_bits */,
 				C868EC9B1E9585DB008449A3 /* main.m */,
@@ -500,7 +500,6 @@
 				C8183FEA1EA835D10017677D /* gray85.jpg in Resources */,
 				C8183FCE1EA835D10017677D /* gray54.jpg in Resources */,
 				C8183FC81EA835D10017677D /* gray47.jpg in Resources */,
-				C868ECBD1E95D35D008449A3 /* sudoku.JPG in Resources */,
 				C8183FD71EA835D10017677D /* gray64.jpg in Resources */,
 				C8183FB41EA835D10017677D /* gray25.jpg in Resources */,
 				C8183FAD1EA835D10017677D /* gray17.jpg in Resources */,
@@ -541,6 +540,7 @@
 				C8183FB01EA835D10017677D /* gray21.jpg in Resources */,
 				C8183FDB1EA835D10017677D /* gray68.jpg in Resources */,
 				C8183FBF1EA835D10017677D /* gray37.jpg in Resources */,
+				C855745A1EB9141800EF2340 /* training in Resources */,
 				C8183FC61EA835D10017677D /* gray45.jpg in Resources */,
 				C8183FC71EA835D10017677D /* gray46.jpg in Resources */,
 				C868ECA51E9585DB008449A3 /* Main.storyboard in Resources */,

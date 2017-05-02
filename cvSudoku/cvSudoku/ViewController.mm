@@ -46,6 +46,7 @@ const Scalar WHITE = Scalar(255,255,255);
     int sudoku[N][N];
     DigitRecognizer *dr;
     NSMutableArray *tfArray;
+    int kk;
 }
 @end
 
@@ -162,24 +163,39 @@ const Scalar WHITE = Scalar(255,255,255);
 //    liveView_.hidden = false;
 //    takephotoButton_.hidden = false;
 //    goliveButton_.hidden = true;
+
+    kk = 0;
+    for (int i = 10; i < 29; i++) {
+        NSString *filename = [NSString stringWithFormat:@"training/IMG_00%d.JPG", i];
+//        NSString *filename = @"training/IMG_0012.JPG";
+        UIImage *image = [UIImage imageNamed:filename];
+        if(image != nil) liveView_.image = [self findPuzzle:image];
+        else cout << "Cannot read in the image " << i << endl;
+        resultView_.hidden = true;
+        liveView_.hidden = false;
+        takephotoButton_.hidden = false;
+        goliveButton_.hidden = true;
+        kk += 1;
+    }
     
-    UIImage *image = [UIImage imageNamed:@"sudoku.JPG"];
-    if(image != nil) [self findPuzzle:image];
-    else cout << "Cannot read in the image" << endl;
-    resultView_.hidden = false;
-    liveView_.hidden = true;
-    takephotoButton_.hidden = true;
-    goliveButton_.hidden = false;
+//    UIImage *image = [UIImage imageNamed:@"training/sudoku.JPG"];
+//    if(image != nil) [self findPuzzle:image];
+//    else cout << "Cannot read in the image" << endl;
+//    resultView_.hidden = false;
+//    liveView_.hidden = true;
+//    takephotoButton_.hidden = true;
+//    goliveButton_.hidden = false;
     
     // load board view
-    UIImage *board = [UIImage imageNamed:@"board.JPG"];
-    if(board != nil) boardView_.image = board;
-    else cout << "Cannot read in the board" << endl;
+//    UIImage *board = [UIImage imageNamed:@"board.JPG"];
+//    if(board != nil) boardView_.image = board;
+//    else cout << "Cannot read in the board" << endl;
     
 }
 
--(void)findPuzzle:(UIImage *)image {
-//    UIImage *resImage;
+//-(void)findPuzzle:(UIImage *)image {
+-(UIImage *)findPuzzle:(UIImage *)image {
+    UIImage *resImage;
     cv::Mat cvImage, cvImageCopy;
     UIImageToMat(image, cvImage);
     cvImage.copyTo(cvImageCopy);
@@ -231,7 +247,7 @@ const Scalar WHITE = Scalar(255,255,255);
 //        circle(cvImageCopy, contours[maxi][i], 15, BLUE, 2, 8, 0);
 //    }
     
-//    resImage = MatToUIImage(cvImageCopy);
+    resImage = MatToUIImage(cvImageCopy);
 
     // find warp function
     vector<Point2f> corner;
@@ -291,72 +307,75 @@ const Scalar WHITE = Scalar(255,255,255);
             cout << "loop: " << i << " " << j << endl;
             ggrid = [self findGridGray:&grid];
             Mat cropped = [self rectify:&ggrid];
-//            resImage = MatToUIImage(input);
+//            resImage = MatToUIImage(cropped);
+//            resImage = MatToUIImage([self findGridGray:&grid]);
+//            [self saveLocal:resImage mode:@"gray" row:i col:j];
             
 //            NSString *filename = [NSString stringWithFormat:@"gray%d%d", i, j];
 //            NSString *testPath = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
 //            std::string digitPath = std::string([testPath UTF8String]);
 //            cout << digitPath << endl;
 //            cv::Mat cropped = cv::imread(digitPath, CV_8UC1);
-            
-            digit = recognize(cropped, dr);
+//            
+            digit = recognize(cropped, dr, kk, i, j);
             std::cout << "digit: " << digit << std::endl;
             
-            UITextField *uitf = (UITextField *)tfArray[j][N - 1 - i];
-            uitf.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-            uitf.textAlignment = NSTextAlignmentCenter;
-            uitf.font = [uitf.font fontWithSize:30.0];
-            if (digit == -1) {
-                sudoku[j][N - 1 - i] = 0;
-                uitf.placeholder = @"0";
-                uitf.backgroundColor = [UIColor blueColor];
-                uitf.enabled = true;
-                uitf.delegate = self;
-            } else {
-                sudoku[j][N - 1 - i] = digit;
-                uitf.text = [NSString stringWithFormat:@"%d", digit];
-                uitf.backgroundColor = [UIColor greenColor];
-                uitf.enabled = false;
-            }
+//            if (i == 4 && j == 8) {
+//                digit = 6;
+//            }
             
-//            resImage = MatToUIImage([self findGridGray:&grid]);
-//            [self saveLocal:resImage mode:@"gray" row:i col:j];
+//            UITextField *uitf = (UITextField *)tfArray[j][N - 1 - i];
+//            uitf.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+//            uitf.textAlignment = NSTextAlignmentCenter;
+//            uitf.font = [uitf.font fontWithSize:30.0];
+//            if (digit == -1) {
+//                sudoku[j][N - 1 - i] = 0;
+//                uitf.placeholder = @"0";
+//                uitf.backgroundColor = [UIColor blueColor];
+//                uitf.enabled = true;
+//                uitf.delegate = self;
+//            } else {
+//                sudoku[j][N - 1 - i] = digit;
+//                uitf.text = [NSString stringWithFormat:@"%d", digit];
+//                uitf.backgroundColor = [UIColor greenColor];
+//                uitf.enabled = false;
+//            }
         }
     }
     
-    cout << "original:" << endl;
-    printGrid(sudoku);
-    if (SolveSudoku(sudoku) == true) {
-        [self showMessage:@"Let's Start!!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor] keep:false];
-        cout << "solve:" << endl;
-        printGrid(sudoku);
-        for (int i = 0; i < N; i += 1) {
-            for (int j = 0; j < N; j += 1) {
-                UITextField *uitf = (UITextField *)tfArray[i][j];
-                if ([uitf.placeholder isEqualToString:@"0"]) {
-                    uitf.attributedPlaceholder = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%d", sudoku[i][j]] attributes:@{NSForegroundColorAttributeName:[UIColor blueColor]}];
-                }
-            }
-        }
-    } else {
-        [self showMessage:@"No solution!!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor] keep:true];
-        cout << "No solution exists" << endl;
-        for (int i = 0; i < N; i += 1) {
-            for (int j = 0; j < N; j += 1) {
-                UITextField *uitf = (UITextField *)tfArray[i][j];
-                uitf.placeholder = @"";
-                uitf.enabled = false;
-            }
-        }
-    }
+//    cout << "original:" << endl;
+//    printGrid(sudoku);
+//    if (SolveSudoku(sudoku) == true) {
+//        [self showMessage:@"Let's Start!!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor] keep:false];
+//        cout << "solve:" << endl;
+//        printGrid(sudoku);
+//        for (int i = 0; i < N; i += 1) {
+//            for (int j = 0; j < N; j += 1) {
+//                UITextField *uitf = (UITextField *)tfArray[i][j];
+//                if ([uitf.placeholder isEqualToString:@"0"]) {
+//                    uitf.attributedPlaceholder = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%d", sudoku[i][j]] attributes:@{NSForegroundColorAttributeName:[UIColor blueColor]}];
+//                }
+//            }
+//        }
+//    } else {
+//        [self showMessage:@"No solution!!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor] keep:true];
+//        cout << "No solution exists" << endl;
+//        for (int i = 0; i < N; i += 1) {
+//            for (int j = 0; j < N; j += 1) {
+//                UITextField *uitf = (UITextField *)tfArray[i][j];
+//                uitf.placeholder = @"";
+//                uitf.enabled = false;
+//            }
+//        }
+//    }
     
 //    resImage = MatToUIImage(cvImageCopy);
 
     // Special part to ensure the image is rotated properly when the image is converted back
-//    UIImage *retImage = [UIImage imageWithCGImage:[resImage CGImage] scale:1.0 orientation:UIImageOrientationRight];
+    UIImage *retImage = [UIImage imageWithCGImage:[resImage CGImage] scale:1.0 orientation:UIImageOrientationRight];
     
 //    return resImage;
-//    return retImage;
+    return retImage;
 }
 
 -(Mat)rectify:(Mat *)grid {

@@ -13,8 +13,7 @@
 #import "opencv2/highgui/ios.h"
 #endif
 
-#import <TesseractOCR/TesseractOCR.h>
-@interface ViewController : UIViewController<CvPhotoCameraDelegate, UITextFieldDelegate, G8TesseractDelegate>
+@interface ViewController : UIViewController<CvPhotoCameraDelegate, UITextFieldDelegate>
 
 
 @end

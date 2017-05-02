@@ -18,7 +18,7 @@
 using namespace cv;
 using namespace std;
 
-int recognize(Mat input, DigitRecognizer *dr); //string imgPath, string lbPath
+int recognize(Mat input, DigitRecognizer *dr, int kk, int i, int j); //string imgPath, string lbPath
 Mat crop_image(Mat input);
 
 #endif /* outputNumber_hpp */

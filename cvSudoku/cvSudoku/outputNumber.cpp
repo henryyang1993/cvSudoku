@@ -38,7 +38,7 @@ Mat crop_image (Mat input) {
     return cropped;
 }
 
-int recognize(Mat input, DigitRecognizer *dr) { //string imgPath, string lbPath
+int recognize(Mat input, DigitRecognizer *dr, int kk, int i, int j) { //string imgPath, string lbPath
     
 
     Mat cropped;
@@ -62,6 +62,7 @@ int recognize(Mat input, DigitRecognizer *dr) { //string imgPath, string lbPath
         for (int j = 0; j < cvThreshold.cols; j++) {
             if (i < 2 || j < 2 || i >= cvThreshold.rows - 2 || j >= cvThreshold.cols - 2) {
                 cvThreshold.at<uchar>(i, j) = 0;
+                cvaThreshold.at<uchar>(i, j) = 0;
             }
             if (cvThreshold.at<uchar>(i, j) == 0)
                 count++;
@@ -73,6 +74,10 @@ int recognize(Mat input, DigitRecognizer *dr) { //string imgPath, string lbPath
     
     cout << "cvThreshold" << endl;
     cout << cvThreshold << endl;
+    
+    char filename[100];
+    sprintf(filename, "/Users/yanghanyu/github/CMU_16423_CVAPPS/cvSudoku/cvSudoku/test/%d%d%d.jpg", kk, i, j);
+    imwrite(filename, cvaThreshold);
     
     double black_pixels = 1 - count/(double)(cvThreshold.rows*cvThreshold.cols);
     cout << "black percentage: " << black_pixels << endl;
