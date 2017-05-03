@@ -46,6 +46,7 @@ const Scalar WHITE = Scalar(255,255,255);
     int sudoku[N][N];
     DigitRecognizer *dr;
     NSMutableArray *tfArray;
+    UIButton *solutionBtn;
     int kk;
 }
 @end
@@ -134,13 +135,18 @@ const Scalar WHITE = Scalar(255,255,255);
         }
     }
     
+    solutionBtn = [self simpleButton:@"Crack it!" buttonColor:[UIColor blueColor] solution:true];
+    // Important part that connects the action to the member function buttonWasPressed
+    [solutionBtn addTarget:self action:@selector(solutionWasPressed) forControlEvents:UIControlEventTouchUpInside];
+
+    
     // 2. First setup a button to take a single picture
-    takephotoButton_ = [self simpleButton:@"Take Photo" buttonColor:[UIColor redColor]];
+    takephotoButton_ = [self simpleButton:@"Take Photo" buttonColor:[UIColor redColor] solution:false];
     // Important part that connects the action to the member function buttonWasPressed
     [takephotoButton_ addTarget:self action:@selector(buttonWasPressed) forControlEvents:UIControlEventTouchUpInside];
     
     // 3. Setup another button to go back to live video
-    goliveButton_ = [self simpleButton:@"Go Live" buttonColor:[UIColor greenColor]];
+    goliveButton_ = [self simpleButton:@"Go Live" buttonColor:[UIColor greenColor] solution:false];
     // Important part that connects the action to the member function buttonWasPressed
     [goliveButton_ addTarget:self action:@selector(liveWasPressed) forControlEvents:UIControlEventTouchUpInside];
     
@@ -152,31 +158,44 @@ const Scalar WHITE = Scalar(255,255,255);
     photoCamera_.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack;
     
     // This is used to set the image resolution
-    photoCamera_.defaultAVCaptureSessionPreset = AVCaptureSessionPreset640x480;
+    photoCamera_.defaultAVCaptureSessionPreset = AVCaptureSessionPresetPhoto;
     
     // This is used to determine the device orientation
     photoCamera_.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait;
     
     // This starts the camera capture
-//    [photoCamera_ start];
+    [photoCamera_ start];
+    resultView_.hidden = true;
+    liveView_.hidden = false;
+    takephotoButton_.hidden = false;
+    goliveButton_.hidden = true;
+
+    
+    //----------- generating training set -------------//
+//    kk = 0;
+//    for (int i = 10; i < 29; i++) {
+//        NSString *filename = [NSString stringWithFormat:@"training/IMG_00%d.JPG", i];
+////        NSString *filename = @"training/IMG_0012.JPG";
+//        UIImage *image = [UIImage imageNamed:filename];
+//        if(image != nil) liveView_.image = [self findPuzzle:image];
+//        else cout << "Cannot read in the image " << i << endl;
+//        resultView_.hidden = true;
+//        liveView_.hidden = false;
+//        takephotoButton_.hidden = false;
+//        goliveButton_.hidden = true;
+//        kk += 1;
+//    }
+    //----------- generating training set -------------//
+
+    
+//    UIImage *image = [UIImage imageNamed:@"training/sudoku.JPG"];
+//    if(image != nil) liveView_.image = [self findPuzzle:image];
+//    else cout << "Cannot read in the image" << endl;
 //    resultView_.hidden = true;
 //    liveView_.hidden = false;
 //    takephotoButton_.hidden = false;
 //    goliveButton_.hidden = true;
-
-    kk = 0;
-    for (int i = 10; i < 29; i++) {
-        NSString *filename = [NSString stringWithFormat:@"training/IMG_00%d.JPG", i];
-//        NSString *filename = @"training/IMG_0012.JPG";
-        UIImage *image = [UIImage imageNamed:filename];
-        if(image != nil) liveView_.image = [self findPuzzle:image];
-        else cout << "Cannot read in the image " << i << endl;
-        resultView_.hidden = true;
-        liveView_.hidden = false;
-        takephotoButton_.hidden = false;
-        goliveButton_.hidden = true;
-        kk += 1;
-    }
+    
     
 //    UIImage *image = [UIImage imageNamed:@"training/sudoku.JPG"];
 //    if(image != nil) [self findPuzzle:image];
@@ -187,9 +206,9 @@ const Scalar WHITE = Scalar(255,255,255);
 //    goliveButton_.hidden = false;
     
     // load board view
-//    UIImage *board = [UIImage imageNamed:@"board.JPG"];
-//    if(board != nil) boardView_.image = board;
-//    else cout << "Cannot read in the board" << endl;
+    UIImage *board = [UIImage imageNamed:@"board.JPG"];
+    if(board != nil) boardView_.image = board;
+    else cout << "Cannot read in the board" << endl;
     
 }
 
@@ -240,14 +259,12 @@ const Scalar WHITE = Scalar(255,255,255);
 
     cout << "maxi: " << endl << maxi << endl;
 
-    drawContours(cvImageCopy, contours, maxi, BLUE, 4, 8);
-
+//    drawContours(cvImageCopy, contours, maxi, BLUE, 4, 8);
 //    for (int i = 0; i < contours[maxi].size(); i++) {
 //        cout << contours[maxi][i] << endl;
 //        circle(cvImageCopy, contours[maxi][i], 15, BLUE, 2, 8, 0);
 //    }
-    
-    resImage = MatToUIImage(cvImageCopy);
+//    resImage = MatToUIImage(cvImageCopy);
 
     // find warp function
     vector<Point2f> corner;
@@ -272,14 +289,8 @@ const Scalar WHITE = Scalar(255,255,255);
     // image transform
     cv::Size size(w, h);
     warpPerspective(cvImage, cvImageCopy, M, size);
-    
-//    //拉普拉斯锐化
-//    float kernel_data[10] = {-1, -1, -1, -1, 8, -1, -1, -1, -1};
-//    Mat kernel(3, 3, CV_32F, kernel_data);
-//    cout << kernel << endl;
-//    filter2D(cvImageCopy, cvImageCopy, cvImageCopy.depth(), kernel);
-    
-    Mat warp_thresh;
+
+//    resImage = MatToUIImage(cvImageCopy);
     
     cout << "size:" << endl;
     cout << w << " " << h << endl;
@@ -307,6 +318,8 @@ const Scalar WHITE = Scalar(255,255,255);
             cout << "loop: " << i << " " << j << endl;
             ggrid = [self findGridGray:&grid];
             Mat cropped = [self rectify:&ggrid];
+//            cout << "cropped:" << endl;
+//            cout << cropped << endl;
 //            resImage = MatToUIImage(cropped);
 //            resImage = MatToUIImage([self findGridGray:&grid]);
 //            [self saveLocal:resImage mode:@"gray" row:i col:j];
@@ -316,7 +329,7 @@ const Scalar WHITE = Scalar(255,255,255);
 //            std::string digitPath = std::string([testPath UTF8String]);
 //            cout << digitPath << endl;
 //            cv::Mat cropped = cv::imread(digitPath, CV_8UC1);
-//            
+            
             digit = recognize(cropped, dr, kk, i, j);
             std::cout << "digit: " << digit << std::endl;
             
@@ -324,56 +337,56 @@ const Scalar WHITE = Scalar(255,255,255);
 //                digit = 6;
 //            }
             
-//            UITextField *uitf = (UITextField *)tfArray[j][N - 1 - i];
-//            uitf.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
-//            uitf.textAlignment = NSTextAlignmentCenter;
-//            uitf.font = [uitf.font fontWithSize:30.0];
-//            if (digit == -1) {
-//                sudoku[j][N - 1 - i] = 0;
-//                uitf.placeholder = @"0";
-//                uitf.backgroundColor = [UIColor blueColor];
-//                uitf.enabled = true;
-//                uitf.delegate = self;
-//            } else {
-//                sudoku[j][N - 1 - i] = digit;
-//                uitf.text = [NSString stringWithFormat:@"%d", digit];
-//                uitf.backgroundColor = [UIColor greenColor];
-//                uitf.enabled = false;
-//            }
+            UITextField *uitf = (UITextField *)tfArray[j][N - 1 - i];
+            uitf.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
+            uitf.textAlignment = NSTextAlignmentCenter;
+            uitf.font = [uitf.font fontWithSize:30.0];
+            if (digit == -1) {
+                sudoku[j][N - 1 - i] = 0;
+                uitf.placeholder = @"0";
+                uitf.backgroundColor = [UIColor blueColor];
+                uitf.enabled = true;
+                uitf.delegate = self;
+            } else {
+                sudoku[j][N - 1 - i] = digit;
+                uitf.text = [NSString stringWithFormat:@"%d", digit];
+                uitf.backgroundColor = [UIColor greenColor];
+                uitf.enabled = false;
+            }
         }
     }
     
-//    cout << "original:" << endl;
-//    printGrid(sudoku);
-//    if (SolveSudoku(sudoku) == true) {
-//        [self showMessage:@"Let's Start!!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor] keep:false];
-//        cout << "solve:" << endl;
-//        printGrid(sudoku);
-//        for (int i = 0; i < N; i += 1) {
-//            for (int j = 0; j < N; j += 1) {
-//                UITextField *uitf = (UITextField *)tfArray[i][j];
-//                if ([uitf.placeholder isEqualToString:@"0"]) {
-//                    uitf.attributedPlaceholder = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%d", sudoku[i][j]] attributes:@{NSForegroundColorAttributeName:[UIColor blueColor]}];
-//                }
-//            }
-//        }
-//    } else {
-//        [self showMessage:@"No solution!!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor] keep:true];
-//        cout << "No solution exists" << endl;
-//        for (int i = 0; i < N; i += 1) {
-//            for (int j = 0; j < N; j += 1) {
-//                UITextField *uitf = (UITextField *)tfArray[i][j];
-//                uitf.placeholder = @"";
-//                uitf.enabled = false;
-//            }
-//        }
-//    }
-    
-//    resImage = MatToUIImage(cvImageCopy);
+    cout << "original:" << endl;
+    printGrid(sudoku);
+    if (SolveSudoku(sudoku) == true) {
+        [self showMessage:@"Let's Start!!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor] keep:false];
+        cout << "solve:" << endl;
+        printGrid(sudoku);
+        for (int i = 0; i < N; i += 1) {
+            for (int j = 0; j < N; j += 1) {
+                UITextField *uitf = (UITextField *)tfArray[i][j];
+                if ([uitf.placeholder isEqualToString:@"0"]) {
+                    uitf.attributedPlaceholder = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%d", sudoku[i][j]] attributes:@{NSForegroundColorAttributeName:[UIColor blueColor]}];
+                }
+            }
+        }
+        solutionBtn.hidden = false;
+    } else {
+        [self showMessage:@"No solution!!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3) atColor:[UIColor redColor] keep:true];
+        cout << "No solution exists" << endl;
+        for (int i = 0; i < N; i += 1) {
+            for (int j = 0; j < N; j += 1) {
+                UITextField *uitf = (UITextField *)tfArray[i][j];
+                uitf.placeholder = @"";
+                uitf.enabled = false;
+            }
+        }
+        solutionBtn.hidden = true;
+    }
 
     // Special part to ensure the image is rotated properly when the image is converted back
     UIImage *retImage = [UIImage imageWithCGImage:[resImage CGImage] scale:1.0 orientation:UIImageOrientationRight];
-    
+
 //    return resImage;
     return retImage;
 }
@@ -526,7 +539,8 @@ const Scalar WHITE = Scalar(255,255,255);
             }
         }
     }
-    [self showMessage:@"Congratulations!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3 + 40) atColor:[UIColor blueColor] keep:true];
+    solutionBtn.hidden = true;
+    [self showMessage:@"Congratulations!!!" atPoint:CGPointMake(self.view.frame.size.width / 2, self.view.frame.size.height * 2 / 3 + 40) atColor:[UIColor greenColor] keep:true];
 }
 
 - (void)showMessage:(NSString*)message atPoint:(CGPoint)point atColor:(UIColor*)color keep:(bool)keep {
@@ -546,7 +560,7 @@ const Scalar WHITE = Scalar(255,255,255);
     if (keep) {
         nsti = 5;
     } else {
-        nsti = 1;
+        nsti = 2;
     }
     [UIView animateWithDuration:1 delay:nsti options:0 animations:^{
         label.alpha = 0;
@@ -554,6 +568,21 @@ const Scalar WHITE = Scalar(255,255,255);
         label.hidden = YES;
         [label removeFromSuperview];
     }];
+}
+
+- (void)solutionWasPressed {
+    cout << "crack it!" << endl;
+    for (int i = 0; i < N; i += 1) {
+        for (int j = 0; j < N; j += 1) {
+            UITextField *uitf = (UITextField *)tfArray[i][j];
+            if (uitf.placeholder.length > 0) {
+                uitf.text = uitf.placeholder;
+                uitf.backgroundColor = [UIColor greenColor];
+                uitf.enabled = false;
+            }
+        }
+    }
+    [self congratulation];
 }
 
 //===============================================================================================
@@ -577,6 +606,7 @@ const Scalar WHITE = Scalar(255,255,255);
     liveView_.hidden = true;
     resultView_.hidden = false; // Turn the hidden view on
     
+//    boardView_.image = [self findPuzzle:image];
     [self findPuzzle:image];
     
     [takephotoButton_ setHidden:true]; [goliveButton_ setHidden:false]; // Switch visibility of buttons
@@ -591,20 +621,32 @@ const Scalar WHITE = Scalar(255,255,255);
 // Simple member function to initialize buttons in the bottom of the screen so we do not have to
 // bother with storyboard, and can go straight into vision on mobiles
 //
-- (UIButton *) simpleButton:(NSString *)buttonName buttonColor:(UIColor *)color
+- (UIButton *) simpleButton:(NSString *)buttonName buttonColor:(UIColor *)color solution:(bool)s
 {
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom]; // Initialize the button
     // Bit of a hack, but just positions the button at the bottom of the screen
     int button_width = 200; int button_height = 50; // Set the button height and width (heuristic)
     // Botton position is adaptive as this could run on a different device (iPAD, iPhone, etc.)
-    int button_x = (self.view.frame.size.width - button_width)/2; // Position of top-left of button
-    int button_y = self.view.frame.size.height - 80; // Position of top-left of button
-    button.frame = CGRectMake(button_x, button_y, button_width, button_height); // Position the button
-    [button setTitle:buttonName forState:UIControlStateNormal]; // Set the title for the button
-    [button setTitleColor:color forState:UIControlStateNormal]; // Set the color for the title
+    int button_x, button_y;
+    if (s) {
+        button_x = (self.view.frame.size.width - button_width)/2;
+        button_y = self.view.frame.size.height - 400;
+        button.frame = CGRectMake(button_x, button_y, button_width, button_height); // Position the button
+        [button setTitle:buttonName forState:UIControlStateNormal]; // Set the title for the button
+        [button setTitleColor:color forState:UIControlStateNormal]; // Set the color for the title
+        
+        [resultView_ addSubview:button];
+    } else {
+        button_x = (self.view.frame.size.width - button_width)/2; // Position of top-left of button
+        button_y = self.view.frame.size.height - 80; // Position of top-left of button
+        button.frame = CGRectMake(button_x, button_y, button_width, button_height); // Position the button
+        [button setTitle:buttonName forState:UIControlStateNormal]; // Set the title for the button
+        [button setTitleColor:color forState:UIControlStateNormal]; // Set the color for the title
+        
+        [self.view addSubview:button]; // Important: add the button as a subview
+        //[button setEnabled:bflag]; [button setHidden:(!bflag)]; // Set visibility of the button
+    }
     
-    [self.view addSubview:button]; // Important: add the button as a subview
-    //[button setEnabled:bflag]; [button setHidden:(!bflag)]; // Set visibility of the button
     return button; // Return the button pointer
 }
 
