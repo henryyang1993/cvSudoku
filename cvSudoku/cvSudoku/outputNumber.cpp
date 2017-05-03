@@ -71,13 +71,13 @@ int recognize(Mat input, DigitRecognizer *dr, int kk, int i, int j) { //string i
     
     cout << "cvaThreshold" << endl;
     cout << cvaThreshold << endl;
-    
+
     cout << "cvThreshold" << endl;
     cout << cvThreshold << endl;
-    
-    char filename[100];
-    sprintf(filename, "/Users/yanghanyu/github/CMU_16423_CVAPPS/cvSudoku/cvSudoku/test/%d%d%d.jpg", kk, i, j);
-    imwrite(filename, cvaThreshold);
+//
+//    char filename[100];
+//    sprintf(filename, "/Users/yanghanyu/github/CMU_16423_CVAPPS/cvSudoku/cvSudoku/test/%d%d%d.jpg", kk, i, j);
+//    imwrite(filename, cvaThreshold);
     
     double black_pixels = 1 - count/(double)(cvThreshold.rows*cvThreshold.cols);
     cout << "black percentage: " << black_pixels << endl;
