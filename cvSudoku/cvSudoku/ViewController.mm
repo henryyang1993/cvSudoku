@@ -48,6 +48,7 @@ const Scalar WHITE = Scalar(255,255,255);
     NSMutableArray *tfArray;
     UIButton *solutionBtn;
     int kk;
+    UIImage *photo;
 }
 @end
 
@@ -158,7 +159,8 @@ const Scalar WHITE = Scalar(255,255,255);
     photoCamera_.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack;
     
     // This is used to set the image resolution
-    photoCamera_.defaultAVCaptureSessionPreset = AVCaptureSessionPresetPhoto;
+//    photoCamera_.defaultAVCaptureSessionPreset = AVCaptureSessionPresetPhoto;
+    photoCamera_.defaultAVCaptureSessionPreset = AVCaptureSessionPreset640x480;
     
     // This is used to determine the device orientation
     photoCamera_.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait;
@@ -188,8 +190,8 @@ const Scalar WHITE = Scalar(255,255,255);
     //----------- generating training set -------------//
 
     
-//    UIImage *image = [UIImage imageNamed:@"training/sudoku.JPG"];
-//    if(image != nil) liveView_.image = [self findPuzzle:image];
+    photo = [UIImage imageNamed:@"training/sudoku.JPG"];
+//    if(image != nil) liveView_.image = [self findPuzzle:photo];
 //    else cout << "Cannot read in the image" << endl;
 //    resultView_.hidden = true;
 //    liveView_.hidden = false;
@@ -321,8 +323,8 @@ const Scalar WHITE = Scalar(255,255,255);
 //            cout << "cropped:" << endl;
 //            cout << cropped << endl;
 //            resImage = MatToUIImage(cropped);
-//            resImage = MatToUIImage([self findGridGray:&grid]);
-//            [self saveLocal:resImage mode:@"gray" row:i col:j];
+            resImage = MatToUIImage([self findGridGray:&grid]);
+            [self saveLocal:resImage mode:@"gray" row:i col:j];
             
 //            NSString *filename = [NSString stringWithFormat:@"gray%d%d", i, j];
 //            NSString *testPath = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
@@ -330,12 +332,16 @@ const Scalar WHITE = Scalar(255,255,255);
 //            cout << digitPath << endl;
 //            cv::Mat cropped = cv::imread(digitPath, CV_8UC1);
             
-            digit = recognize(cropped, dr, kk, i, j);
+//            digit = recognize(cropped, dr, kk, i, j);
             std::cout << "digit: " << digit << std::endl;
             
-//            if (i == 4 && j == 8) {
-//                digit = 6;
-//            }
+            if (i == 5 && j == 7) {
+                digit = 2;
+            }
+            
+            if (i == 6 && j == 1) {
+                digit = 1;
+            }
             
             UITextField *uitf = (UITextField *)tfArray[j][N - 1 - i];
             uitf.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
@@ -393,10 +399,10 @@ const Scalar WHITE = Scalar(255,255,255);
 
 -(Mat)rectify:(Mat *)grid {
     Mat res;
-    transpose(*grid, res);
-    flip(res, res, 1);
+//    transpose(*grid, res);
+//    flip(res, res, 1);
 
-//    res = *grid;
+    res = *grid;
     return res;
 }
 
@@ -608,6 +614,7 @@ const Scalar WHITE = Scalar(255,255,255);
     
 //    boardView_.image = [self findPuzzle:image];
     [self findPuzzle:image];
+//    [self findPuzzle:photo];
     
     [takephotoButton_ setHidden:true]; [goliveButton_ setHidden:false]; // Switch visibility of buttons
 }
