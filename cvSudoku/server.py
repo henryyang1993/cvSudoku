@@ -1,13 +1,25 @@
 from flask import Flask, request
-from datetime import datetime
+import numpy as np
 
 
 app = Flask(__name__, static_url_path='')
 
-@app.route("/test", methods=['GET'])
+@app.route("/test", methods=['POST'])
 def handleQ1():
-    if "matrix" in request.args:
-        matrix = request.args.get('matrix')
+    rows, cols, matrix = None, None, None
+    if "rows" in request.form:
+        rows = int(request.form.get('rows'))
+    else:
+        return "INVALID";
+
+    if "cols" in request.form:
+        cols = int(request.form.get('cols'))
+    else:
+        return "INVALID";
+
+    if "matrix" in request.form:
+        matrix = request.form.get('matrix')
+        matrix = np.reshape(map(int, matrix[1:].split("#")), (rows, cols))
     else:
         return "INVALID";
     

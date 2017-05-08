@@ -166,11 +166,11 @@ const Scalar WHITE = Scalar(255,255,255);
     photoCamera_.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait;
     
     // This starts the camera capture
-    [photoCamera_ start];
-    resultView_.hidden = true;
-    liveView_.hidden = false;
-    takephotoButton_.hidden = false;
-    goliveButton_.hidden = true;
+//    [photoCamera_ start];
+//    resultView_.hidden = true;
+//    liveView_.hidden = false;
+//    takephotoButton_.hidden = false;
+//    goliveButton_.hidden = true;
 
     
     //----------- generating training set -------------//
@@ -190,7 +190,7 @@ const Scalar WHITE = Scalar(255,255,255);
     //----------- generating training set -------------//
 
     
-    photo = [UIImage imageNamed:@"training/sudoku.JPG"];
+//    photo = [UIImage imageNamed:@"training/sudoku.JPG"];
 //    if(image != nil) liveView_.image = [self findPuzzle:photo];
 //    else cout << "Cannot read in the image" << endl;
 //    resultView_.hidden = true;
@@ -199,13 +199,13 @@ const Scalar WHITE = Scalar(255,255,255);
 //    goliveButton_.hidden = true;
     
     
-//    UIImage *image = [UIImage imageNamed:@"training/sudoku.JPG"];
-//    if(image != nil) [self findPuzzle:image];
-//    else cout << "Cannot read in the image" << endl;
-//    resultView_.hidden = false;
-//    liveView_.hidden = true;
-//    takephotoButton_.hidden = true;
-//    goliveButton_.hidden = false;
+    UIImage *image = [UIImage imageNamed:@"training/sudoku.JPG"];
+    if(image != nil) [self findPuzzle:image];
+    else cout << "Cannot read in the image" << endl;
+    resultView_.hidden = false;
+    liveView_.hidden = true;
+    takephotoButton_.hidden = true;
+    goliveButton_.hidden = false;
     
     // load board view
     UIImage *board = [UIImage imageNamed:@"board.JPG"];
@@ -320,11 +320,14 @@ const Scalar WHITE = Scalar(255,255,255);
             cout << "loop: " << i << " " << j << endl;
             ggrid = [self findGridGray:&grid];
             Mat cropped = [self rectify:&ggrid];
+            
+            digit = [self sendHttpPost:cropped];
+            
 //            cout << "cropped:" << endl;
 //            cout << cropped << endl;
 //            resImage = MatToUIImage(cropped);
-            resImage = MatToUIImage([self findGridGray:&grid]);
-            [self saveLocal:resImage mode:@"gray" row:i col:j];
+//            resImage = MatToUIImage([self findGridGray:&grid]);
+//            [self saveLocal:resImage mode:@"gray" row:i col:j];
             
 //            NSString *filename = [NSString stringWithFormat:@"gray%d%d", i, j];
 //            NSString *testPath = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
@@ -333,15 +336,15 @@ const Scalar WHITE = Scalar(255,255,255);
 //            cv::Mat cropped = cv::imread(digitPath, CV_8UC1);
             
 //            digit = recognize(cropped, dr, kk, i, j);
-            std::cout << "digit: " << digit << std::endl;
+//            std::cout << "digit: " << digit << std::endl;
             
-            if (i == 5 && j == 7) {
-                digit = 2;
-            }
-            
-            if (i == 6 && j == 1) {
-                digit = 1;
-            }
+//            if (i == 5 && j == 7) {
+//                digit = 2;
+//            }
+//            
+//            if (i == 6 && j == 1) {
+//                digit = 1;
+//            }
             
             UITextField *uitf = (UITextField *)tfArray[j][N - 1 - i];
             uitf.contentVerticalAlignment = UIControlContentVerticalAlignmentCenter;
@@ -399,10 +402,10 @@ const Scalar WHITE = Scalar(255,255,255);
 
 -(Mat)rectify:(Mat *)grid {
     Mat res;
-//    transpose(*grid, res);
-//    flip(res, res, 1);
+    transpose(*grid, res);
+    flip(res, res, 1);
 
-    res = *grid;
+//    res = *grid;
     return res;
 }
 
@@ -590,6 +593,55 @@ const Scalar WHITE = Scalar(255,255,255);
     }
     [self congratulation];
 }
+
+// HTTP GET request
+- (int)sendHttpPost:(Mat) cropped {
+    NSMutableString *matrix = [NSMutableString stringWithCapacity:1];
+    
+    cout << "cropped:" << endl;
+    cout << cropped.rows << " " << cropped.cols << endl;
+    for (int i = 0; i < cropped.rows; i++) {
+        for (int j = 0; j < cropped.cols; j++) {
+            [matrix appendFormat:@"#%d", cropped.at<uchar>(i, j)];
+        }
+    }
+    
+    NSString *postMsg = [NSString stringWithFormat:@"rows=%d&cols=%d&matrix=%@", cropped.rows, cropped.cols, matrix];
+    NSString *urlStr = @"http://128.237.215.74:8080/test";
+    
+    /*
+     * dataUsingEncoding:allowLossyConversion: - Returns nil if flag is NO and the receiver can’t be converted without losing some information.
+     */
+    NSData *postData = [postMsg dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+    
+    NSString *postLength = [NSString stringWithFormat:@"%lu",(unsigned long)[postData length]];
+    
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] init];
+    
+    [request setURL:[NSURL URLWithString:urlStr]];
+    
+    [request setHTTPMethod:@"POST"];
+    
+    [request setValue:postLength forHTTPHeaderField:@"Content-Length"];
+    
+    /*
+     * Sets value for default header field
+     */
+    [request setValue:@"application/x-www-form-urlencoded" forHTTPHeaderField:@"Content-Type"];
+    
+    [request setHTTPBody:postData];
+    
+    NSURLResponse *response;
+    NSError *error;
+    
+    NSData *responseData = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+    
+    NSString *responseStr = [[NSString alloc] initWithData:responseData encoding:NSUTF8StringEncoding];
+    
+    NSLog(@"digit: %@", responseStr);
+    return [responseStr intValue];
+}
+
 
 //===============================================================================================
 // This member function is executed when the button is pressed
