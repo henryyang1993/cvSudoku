@@ -23,9 +23,10 @@ def handleQ1():
     else:
         return "INVALID";
     
-    print(matrix)
-    digit = 1
-    # digit = recognize(matrix)
+    # print(matrix)
+    # digit = 1
+    digit = recognize(matrix)
+    print(digit)
     
     return str(digit)
 
