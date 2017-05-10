@@ -1,36 +1,134 @@
-from flask import Flask, request
+from __future__ import print_function
+# from flask import Flask, request
 import numpy as np
+import predict_number 
+import keras
+from keras.datasets import mnist
+from keras.models import Sequential
+from keras.layers import Dense, Dropout, Flatten
+from keras.layers import Conv2D, MaxPooling2D
+from keras import backend as K
+from keras.models import load_model
+import h5py 
+import cv2, cv
 
 
-app = Flask(__name__, static_url_path='')
+import SimpleHTTPServer
+import SocketServer
+import logging
+import cgi
 
-@app.route("/test", methods=['POST'])
-def handleQ1():
-    rows, cols, matrix = None, None, None
-    if "rows" in request.form:
-        rows = int(request.form.get('rows'))
-    else:
-        return "INVALID";
+PORT = 8080
+model = load_model('mnist_cnn_model.h5')
 
-    if "cols" in request.form:
-        cols = int(request.form.get('cols'))
-    else:
-        return "INVALID";
+def predict_number(model, roi):
+    count = 0
+    for i in range(roi.shape[0]):
+        tmp = roi[i]
+        for e in tmp:
+            if e == 0:
+                count += 1
+        if count > 750:
+            number = -1
+        else:
+            number = model.predict_classes(roi.reshape(1, 28, 28, 1), batch_size=1, verbose=1)[0]
+    print (number)
+    return number
 
-    if "matrix" in request.form:
-        matrix = request.form.get('matrix')
-        matrix = np.reshape(map(int, matrix[1:].split("#")), (rows, cols))
-    else:
-        return "INVALID";
+class ServerHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
+
+    def do_POST(self):
+        form = cgi.FieldStorage(
+            fp=self.rfile,
+            headers=self.headers,
+            environ={'REQUEST_METHOD':'POST',
+                     'CONTENT_TYPE':self.headers['Content-Type'],
+                     })
+
+        rows, cols, matrix = None, None, None
+        print("form", form)
+        if "rows" in form:
+            rows = int(form['rows'].value)
+        else:
+            return "INVALID";
     
-    # print(matrix)
-    # digit = 1
-    digit = recognize(matrix)
-    print(digit)
+        if "cols" in form:
+            cols = int(form['cols'].value)
+        else:
+            return "INVALID";
     
-    return str(digit)
+        if "matrix" in form:
+            matrix = form['matrix'].value
+            matrix = np.reshape(map(float, matrix[1:].split("#")), (rows, cols))
+        else:
+            return "INVALID";
+        
+        print("matrix: ", matrix.shape)
+        # digit = 1
+        # global i
+    
+        # i += 1
+        # print ('i: ', i)
+        #cv2.imwrite('test' + str(i) + '.jpg', matrix)
+        #digit = predict_number.recognize(matrix, i, model)
+        # print (matrix.shape)
+        digit = predict_number(model, matrix)
+        print('digit: ', digit)
+
+        response = str(digit)
+        self.send_response(200)
+        self.send_header("Content-Length", str(len(response)))
+        self.end_headers()
+        self.wfile.write(response)
+        # return str(digit)
+
+Handler = ServerHandler
+
+httpd = SocketServer.TCPServer(("", PORT), Handler)
+
+print("serving at port", PORT)
+httpd.serve_forever()
 
 
-if __name__ == '__main__':
-    app.run(debug=True, host="0.0.0.0", port=8080, threaded=True)
+# app = Flask(__name__, static_url_path='')
+# model = load_model('mnist_cnn_model.h5')
+# i = 0
+
+# @app.route("/test", methods=['POST'])
+# def handleQ1():
+#     rows, cols, matrix = None, None, None
+#     if "rows" in request.form:
+#         rows = int(request.form.get('rows'))
+#     else:
+#         return "INVALID";
+
+#     if "cols" in request.form:
+#         cols = int(request.form.get('cols'))
+#     else:
+#         return "INVALID";
+
+#     if "matrix" in request.form:
+#         matrix = request.form.get('matrix')
+#         matrix = np.reshape(map(float, matrix[1:].split("#")), (rows, cols))
+#     else:
+#         return "INVALID";
+    
+#     print("matrix: ", matrix.shape)
+#     # digit = 1
+#     global i
+
+#     i += 1
+#     print ('i: ', i)
+#     #cv2.imwrite('test' + str(i) + '.jpg', matrix)
+#     #digit = predict_number.recognize(matrix, i, model)
+#     print (matrix.shape)
+#     digit = predict_number(model, matrix)[0]
+#     #print('digit: ', digit)
+
+    
+#     return str(digit)
+
+
+# if __name__ == '__main__':
+#     app.run(debug=True, host="0.0.0.0", port=8080, threaded=True)
     

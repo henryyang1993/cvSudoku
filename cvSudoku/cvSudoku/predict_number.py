@@ -16,6 +16,12 @@ def read_digit_number(row, col):
 	im = cv2.imread(img_dir)
 	return im
 
+def read_test_img(i):
+	img_dir = 'test' + str(i) + '.jpg'
+	print ("loading image: ", img_dir)
+	im = cv2.imread(img_dir)
+	return im
+
 def rotate_image(img, angle):
 	#cols,rows,chs = img.shape
 	#M = cv2.getRotationMatrix2D((cols/2, rows/2), angle, 1)	
@@ -26,6 +32,7 @@ def rotate_image(img, angle):
 	return img
 
 def find_bounding_box(img):
+
 	im_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 	im_gray = cv2.GaussianBlur(im_gray, (3, 3), 0)
 	ret, im_th = cv2.threshold(im_gray, 200, 255, cv2.THRESH_BINARY_INV)
@@ -76,36 +83,92 @@ def predict_number(model, roi):
 	print (digit)
 	return digit
 
+def recognize(img, i, model):
+	#im = rotate_image(img, 270)
+	roi = img
+	
+	#im_th, rect = find_bounding_box(im)
+	#roi = get_roi(im, im_th, rect)
+	#number = predict_number(model, roi)[0]
+	input = roi.reshape(1, 28, 28, 1)
+	print ("input shape: ", input.shape)
+	input = np.float32(input)
+	digit = model.predict_classes(input, batch_size=1, verbose=1)
+	print ("digit: ", digit)
+	return digit
+
+def generate_board():
+	model = load_model('mnist_cnn_model.h5')
+	sudoku = []
+	for i in range(81):
+		count = 0
+		test_im = read_test_img(i+1)
+		test_im = cv2.cvtColor(test_im, cv2.COLOR_BGR2GRAY)
+		print (test_im.shape)
+		for i in range(test_im.shape[0]):
+			tmp = test_im[i]
+			for e in tmp:
+				if e == 0:
+					count += 1
+		if count > 750:
+			number = -1
+		else:
+			number = predict_number(model, test_im)[0]
+		sudoku.append(number)
+
+	sudoku = np.reshape(sudoku, (9, 9))
+	print (sudoku)
+	return sudoku
+
 def main():
 	model = load_model('mnist_cnn_model.h5')
-	img = read_digit_number(0, 4)
-	im = rotate_image(img, 270)
-	im_th, rect = find_bounding_box(im)
+	# img = read_digit_number(0, 0)
+	# im = rotate_image(img, 270)
+	# im_th, rect = find_bounding_box(im)
 	
-	roi = get_roi(im, im_th, rect)
-	number = predict_number(model, roi)[0]
+	# roi = get_roi(im, im_th, rect)
+	# number = predict_number(model, roi)[0]
 
-	print ('number: ', number)
-	# sudoku = []
+
+	# print ('number: ', number)
+	sudoku = []
+	for i in range(81):
+		count = 0
+		test_im = read_test_img(i+1)
+		test_im = cv2.cvtColor(test_im, cv2.COLOR_BGR2GRAY)
+		print (test_im.shape)
+		for i in range(test_im.shape[0]):
+			tmp = test_im[i]
+			for e in tmp:
+				if e == 0:
+					count += 1
+		if count > 750:
+			number = -1
+		else:
+			number = predict_number(model, test_im)[0]
+		sudoku.append(number)
+
+	sudoku = np.reshape(sudoku, (9, 9))
+	print (sudoku)
 	# for i in xrange(9):
 	# 	sub = []
 	# 	for j in xrange(9):
 	# 		img = read_digit_number(i, j)
-	# 		im = rotate_image(img, 270)
-	# 		im_th, rect = find_bounding_box(im)
-	# 		if rect is None:
-	# 			number = 0
-	# 		else:
-	# 			roi = get_roi(im, im_th, rect)
-	# 			number = predict_number(model, roi)[0]
-	# 			print ('number: ', number)
-	# 			#cv2.namedWindow("thresholded image", cv2.WINDOW_NORMAL)
-	# 			#cv2.imshow("thresholded image", roi)
-	# 			#cv2.waitKey()
+	# 		#im = rotate_image(img, 270)
+	# 		#im_th, rect = find_bounding_box(im)
+	# 		#if rect is None:
+	# 		#	number = 0
+	# 		# else:
+	# 		# 	roi = get_roi(im, im_th, rect)
+	# 		# 	number = predict_number(model, roi)[0]
+	# 		# 	print ('number: ', number)
+	# 		# 	cv2.namedWindow("thresholded image", cv2.WINDOW_NORMAL)
+	# 		# 	cv2.imshow("thresholded image", roi)
+	# 		# 	cv2.waitKey()
 	# 		sub.append(number)
 	# 	sudoku.append(sub)
 	# print (sudoku)
-	# return sudoku
+	return sudoku
 
 if __name__ == '__main__':
   main()
