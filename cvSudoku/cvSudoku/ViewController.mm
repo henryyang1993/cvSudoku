@@ -191,7 +191,7 @@ const Scalar WHITE = Scalar(255,255,255);
 
     
 //    photo = [UIImage imageNamed:@"training/sudoku.JPG"];
-//    if(image != nil) liveView_.image = [self findPuzzle:photo];
+//    if(photo != nil) liveView_.image = [self findPuzzle:photo];
 //    else cout << "Cannot read in the image" << endl;
 //    resultView_.hidden = true;
 //    liveView_.hidden = false;
@@ -318,9 +318,9 @@ const Scalar WHITE = Scalar(255,255,255);
             int crange = (int)colstep * 0.1;
             Mat grid = cvImageCopy.rowRange(i * rowstep + rrange, (i + 1) * rowstep - rrange).colRange(j * colstep + crange, (j + 1) * colstep - crange);
             cout << "loop: " << i << " " << j << endl;
-            ggrid = [self findGrid:&grid];
+            ggrid = [self findGridEdge:&grid];
             Mat cropped = [self rectify:&ggrid];
-            
+//            cout << "cropped: " << cropped << endl;
             digit = [self sendHttpPost:cropped];
             
 //            cout << "cropped:" << endl;
@@ -434,15 +434,59 @@ const Scalar WHITE = Scalar(255,255,255);
     Mat warp_gray;
     cv::cvtColor(gridCopy, warp_gray, CV_RGBA2GRAY); // Convert to grayscale
     
-    //    GaussianBlur(warp_gray, warp_gray, cv::Size(15, 15), 1.5, 1.5);
+    GaussianBlur(warp_gray, warp_gray, cv::Size(3, 3), 0, 0);
     
     Mat thresh, threshCopy;
+
+    vector<vector<cv::Point>> contours;
+
     
+    vector<Vec4i> hierarchy;
     // grid edge detect
-    adaptiveThreshold(warp_gray, thresh, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 135, 15);
-    thresh.copyTo(threshCopy);
+    //adaptiveThreshold(warp_gray, thresh, 255, ADAPTIVE_THRESH_GAUSSIAN_C, THRESH_BINARY_INV, 135, 15);
+    threshold(warp_gray, thresh, 170, 255, THRESH_BINARY_INV);
+    cv::Mat thresh_copy;
+    thresh.copyTo(thresh_copy);
+    findContours(thresh_copy, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
     
-    return threshCopy;
+    vector<cv::Rect> rects( contours.size() );
+    for(int i = 0; i < contours.size(); i++) {
+        rects[i] = boundingRect(contours[i]);
+    }
+
+    cv::Rect digit_rect;
+    for (int i = 0; i < rects.size(); i++) {
+        cv::Rect rect = rects[i];
+        if (rect.width > 20 && rect.height > 20) {
+            digit_rect = rect;
+        }
+    }
+    cout << "digit width: " << digit_rect.width << endl;
+    cout << "digit height: " << digit_rect.height << endl;
+    int leng = int(digit_rect.width * 1.3);
+    int leng_2 = int(digit_rect.height * 1.3);
+    int pt1 = int(digit_rect.x + digit_rect.width/2 - leng/2);
+    int pt2 = int(digit_rect.y + digit_rect.height/2 - leng_2/2);
+    if (pt1 < 0)
+        pt1 = 0;
+    if (pt2 < 0)
+        pt2 = 0;
+    Mat roi;
+    if ((digit_rect.width == 0) && (digit_rect.height == 0)) {
+        roi = Mat::zeros(28, 28, CV_32F);
+    } else {
+        roi = thresh(cv::Range(pt2,pt2+leng_2), cv::Range(pt1, pt1+leng));
+        resize(roi, roi, cv::Size(28, 28));
+    }
+//    cout << "roi: " << roi << endl;
+    //dilate(roi, roi, Size(3, 3));
+    return roi;
+    
+    
+    
+//thresh.copyTo(threshCopy);
+    
+//return threshCopy;
 }
 
 -(void)saveLocal:(UIImage *)pic mode:(NSString* )m row:(int)i col:(int)j {
@@ -594,7 +638,7 @@ const Scalar WHITE = Scalar(255,255,255);
     [self congratulation];
 }
 
-// HTTP GET request
+// HTTP POST request
 - (int)sendHttpPost:(Mat) cropped {
     NSMutableString *matrix = [NSMutableString stringWithCapacity:1];
     
@@ -607,7 +651,7 @@ const Scalar WHITE = Scalar(255,255,255);
     }
     
     NSString *postMsg = [NSString stringWithFormat:@"rows=%d&cols=%d&matrix=%@", cropped.rows, cropped.cols, matrix];
-    NSString *urlStr = @"http://128.237.215.74:8080/test";
+    NSString *urlStr = @"http://128.237.135.70:8080";
     
     /*
      * dataUsingEncoding:allowLossyConversion: - Returns nil if flag is NO and the receiver can’t be converted without losing some information.
