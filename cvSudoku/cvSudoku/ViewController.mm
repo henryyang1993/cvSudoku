@@ -318,7 +318,7 @@ const Scalar WHITE = Scalar(255,255,255);
             int crange = (int)colstep * 0.1;
             Mat grid = cvImageCopy.rowRange(i * rowstep + rrange, (i + 1) * rowstep - rrange).colRange(j * colstep + crange, (j + 1) * colstep - crange);
             cout << "loop: " << i << " " << j << endl;
-            ggrid = [self findGridGray:&grid];
+            ggrid = [self findGrid:&grid];
             Mat cropped = [self rectify:&ggrid];
             
             digit = [self sendHttpPost:cropped];
