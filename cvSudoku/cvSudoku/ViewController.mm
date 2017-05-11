@@ -159,8 +159,8 @@ const Scalar WHITE = Scalar(255,255,255);
     photoCamera_.defaultAVCaptureDevicePosition = AVCaptureDevicePositionBack;
     
     // This is used to set the image resolution
-//    photoCamera_.defaultAVCaptureSessionPreset = AVCaptureSessionPresetPhoto;
-    photoCamera_.defaultAVCaptureSessionPreset = AVCaptureSessionPreset640x480;
+    photoCamera_.defaultAVCaptureSessionPreset = AVCaptureSessionPresetPhoto;
+//    photoCamera_.defaultAVCaptureSessionPreset = AVCaptureSessionPreset640x480;
     
     // This is used to determine the device orientation
     photoCamera_.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait;
@@ -325,9 +325,9 @@ const Scalar WHITE = Scalar(255,255,255);
             
 //            cout << "cropped:" << endl;
 //            cout << cropped << endl;
-//            resImage = MatToUIImage(cropped);
+            resImage = MatToUIImage(cropped);
 //            resImage = MatToUIImage([self findGridGray:&grid]);
-//            [self saveLocal:resImage mode:@"gray" row:i col:j];
+            [self saveLocal:resImage mode:@"gray_new" row:i col:j];
             
 //            NSString *filename = [NSString stringWithFormat:@"gray%d%d", i, j];
 //            NSString *testPath = [[NSBundle mainBundle] pathForResource:filename ofType:@"jpg"];
