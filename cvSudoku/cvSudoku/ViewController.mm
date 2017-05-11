@@ -61,20 +61,20 @@ const Scalar WHITE = Scalar(255,255,255);
     
     //---------------------------testing digit recognition from input image files---------------------------------------------
     
-    NSString *imgPath = [[NSBundle mainBundle] pathForResource:@"train-images.idx3-ubyte" ofType:@""];
-    trainImgPath = std::string([imgPath UTF8String]);
-    cout << trainImgPath << endl;
-    
-    NSString *labelPath = [[NSBundle mainBundle] pathForResource:@"train-labels.idx1-ubyte" ofType:@""];
-    trainLabelPath = std::string([labelPath UTF8String]);
-    cout << trainLabelPath << endl;
-    
-    dr = new DigitRecognizer();
-    
-    const char *trainPath1 = trainImgPath.c_str();
-    const char *trainPath2 = trainLabelPath.c_str();
-    
-    dr->train(trainPath1, trainPath2);
+//    NSString *imgPath = [[NSBundle mainBundle] pathForResource:@"train-images.idx3-ubyte" ofType:@""];
+//    trainImgPath = std::string([imgPath UTF8String]);
+//    cout << trainImgPath << endl;
+//    
+//    NSString *labelPath = [[NSBundle mainBundle] pathForResource:@"train-labels.idx1-ubyte" ofType:@""];
+//    trainLabelPath = std::string([labelPath UTF8String]);
+//    cout << trainLabelPath << endl;
+//    
+//    dr = new DigitRecognizer();
+//    
+//    const char *trainPath1 = trainImgPath.c_str();
+//    const char *trainPath2 = trainLabelPath.c_str();
+//    
+//    dr->train(trainPath1, trainPath2);
     
     
 //    // Recognizing image of hand-written digit 4 in the Resource folder
@@ -166,11 +166,11 @@ const Scalar WHITE = Scalar(255,255,255);
     photoCamera_.defaultAVCaptureVideoOrientation = AVCaptureVideoOrientationPortrait;
     
     // This starts the camera capture
-//    [photoCamera_ start];
-//    resultView_.hidden = true;
-//    liveView_.hidden = false;
-//    takephotoButton_.hidden = false;
-//    goliveButton_.hidden = true;
+    [photoCamera_ start];
+    resultView_.hidden = true;
+    liveView_.hidden = false;
+    takephotoButton_.hidden = false;
+    goliveButton_.hidden = true;
 
     
     //----------- generating training set -------------//
@@ -190,7 +190,7 @@ const Scalar WHITE = Scalar(255,255,255);
     //----------- generating training set -------------//
 
     
-//    photo = [UIImage imageNamed:@"training/sudoku.JPG"];
+    photo = [UIImage imageNamed:@"training/sudoku.JPG"];
 //    if(photo != nil) liveView_.image = [self findPuzzle:photo];
 //    else cout << "Cannot read in the image" << endl;
 //    resultView_.hidden = true;
@@ -199,13 +199,13 @@ const Scalar WHITE = Scalar(255,255,255);
 //    goliveButton_.hidden = true;
     
     
-    UIImage *image = [UIImage imageNamed:@"training/sudoku.JPG"];
-    if(image != nil) [self findPuzzle:image];
-    else cout << "Cannot read in the image" << endl;
-    resultView_.hidden = false;
-    liveView_.hidden = true;
-    takephotoButton_.hidden = true;
-    goliveButton_.hidden = false;
+//    UIImage *image = [UIImage imageNamed:@"training/sudoku.JPG"];
+//    if(image != nil) [self findPuzzle:image];
+//    else cout << "Cannot read in the image" << endl;
+//    resultView_.hidden = false;
+//    liveView_.hidden = true;
+//    takephotoButton_.hidden = true;
+//    goliveButton_.hidden = false;
     
     // load board view
     UIImage *board = [UIImage imageNamed:@"board.JPG"];
@@ -709,8 +709,8 @@ const Scalar WHITE = Scalar(255,255,255);
     resultView_.hidden = false; // Turn the hidden view on
     
 //    boardView_.image = [self findPuzzle:image];
-    [self findPuzzle:image];
-//    [self findPuzzle:photo];
+//    [self findPuzzle:image];
+    [self findPuzzle:photo];
     
     [takephotoButton_ setHidden:true]; [goliveButton_ setHidden:false]; // Switch visibility of buttons
 }
