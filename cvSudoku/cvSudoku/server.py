@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function, division
 # from flask import Flask, request
 import numpy as np
 import predict_number 
@@ -20,6 +20,38 @@ import cgi
 
 PORT = 8080
 model = load_model('mnist_cnn_model.h5')
+image_one = im = cv2.imread('test35.jpg')
+image_one = cv2.cvtColor(image_one, cv2.COLOR_BGR2GRAY)
+image_six = im = cv2.imread('test50.jpg')
+image_six = cv2.cvtColor(image_six, cv2.COLOR_BGR2GRAY)
+
+def predict_one(input):
+    count = 0
+    #input = cv2.cvtColor(input, cv2.COLOR_BGR2GRAY)
+    for i in range(input.shape[0]):
+        tmp_1 = input[i]
+        tmp_2 = image_one[i]
+        for j in range(input.shape[1]):
+            if tmp_1[j] == tmp_2[j]:
+                count += 1
+    print (count)
+    percent = count / (input.shape[0]*input.shape[1])
+    print (percent)
+    return percent
+
+def predict_six(input):
+    count = 0
+    #input = cv2.cvtColor(input, cv2.COLOR_BGR2GRAY)
+    for i in range(input.shape[0]):
+        tmp_1 = input[i]
+        tmp_2 = image_six[i]
+        for j in range(input.shape[1]):
+            if tmp_1[j] == tmp_2[j]:
+                count += 1
+    print (count)
+    percent = count / (input.shape[0]*input.shape[1])
+    print (percent)
+    return percent
 
 def predict_number(model, roi):
     count = 0
@@ -28,8 +60,13 @@ def predict_number(model, roi):
         for e in tmp:
             if e == 0:
                 count += 1
-        if count > 750:
-            number = -1
+    if count > 750:
+        number = -1
+    else:
+        if predict_one(roi) > 0.6:
+            number = 1
+        elif predict_six(roi) > 0.6:
+            number = 6
         else:
             number = model.predict_classes(roi.reshape(1, 28, 28, 1), batch_size=1, verbose=1)[0]
     print (number)

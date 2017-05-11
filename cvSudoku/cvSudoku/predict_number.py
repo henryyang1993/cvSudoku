@@ -1,4 +1,4 @@
-from __future__ import print_function
+from __future__ import print_function, division
 import keras
 from keras.datasets import mnist
 from keras.models import Sequential
@@ -120,6 +120,23 @@ def generate_board():
 	print (sudoku)
 	return sudoku
 
+
+image_one = im = cv2.imread('test35.jpg')
+image_one = cv2.cvtColor(image_one, cv2.COLOR_BGR2GRAY)
+def predict_one(input):
+	count = 0
+	input = cv2.cvtColor(input, cv2.COLOR_BGR2GRAY)
+	for i in range(input.shape[0]):
+	    tmp_1 = input[i]
+	    tmp_2 = image_one[i]
+	    for j in range(input.shape[1]):
+	        if tmp_1[j] == tmp_2[j]:
+	            count += 1
+	print (count)
+	percent = count / (input.shape[0]*input.shape[1])
+	print (percent)
+	return percent
+
 def main():
 	model = load_model('mnist_cnn_model.h5')
 	# img = read_digit_number(0, 0)
@@ -172,4 +189,7 @@ def main():
 
 if __name__ == '__main__':
   main()
+
+img = cv2.imread("test27.jpg")
+predict_one(img)
 
